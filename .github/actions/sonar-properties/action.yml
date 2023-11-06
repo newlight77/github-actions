@@ -1,0 +1,57 @@
+name: 'Select sonar properties rules according to the project stack before code analysis'
+description: "An action to select sonar properties"
+
+inputs:
+  project-stack:
+    description: the project stack (node | next | react | java | android | ios)
+    required: true
+    type: string
+
+runs:
+  using: "composite"
+  steps:
+    - name: "select project specific properties depending of stack"
+      run: |
+        set +x
+        pwd
+        ls -la .
+        ls -la ./.github
+        ls -la ./.github/actions/sonar-properties
+
+        
+        if [ -f "x$STACK" != "x" ]; then 
+          curl -OL https://github.com/newlight77/github-actions/blob/main/.github/actions/sonar-properties/$STACK.properties
+          cp $STACK.properties sonar-properties.properties
+        else
+          curl -OL https://github.com/newlight77/github-actions/blob/main/.github/actions/sonar-properties/default.properties
+          cp default.properties sonar-properties.properties
+        fi
+
+        echo "::endgroup::"
+      shell: bash
+      env:
+        STACK: ${{ inputs.project-stack }}
+
+    - name: "override project specific properties"
+      run: |
+        set +x
+        sed -i '/sonar.projectKey=/d' sonar-project.properties
+        sed -i '/sonar.host.url=/d' sonar-project.properties
+        sed -i '/sonar.projectName=/d' sonar-project.properties
+        sed -i '/sonar.projectVersion=/d' sonar-project.properties
+        sed -i '/sonar.pullrequest.github.repository=/d' sonar-project.properties
+
+        echo "" >> sonar-project.properties
+        #echo "sonar.organization=newlight77" >> sonar-project.properties
+        #echo "sonar.pullrequest.provider=github" >> sonar-project.properties
+
+        echo "sonar.projectName=${{ github.event.repository.name }}" >> sonar-project.properties
+        echo "sonar.projectKey=newlight77_${{ github.event.repository.name }}" >> sonar-project.properties
+        echo "sonar.pullrequest.github.repository=newlight77/${{ github.event.repository.name }}" >> sonar-project.properties
+
+        echo "::group::Sonar Configuration"
+
+        cat sonar-project.properties
+
+        echo "::endgroup::"
+      shell: bash

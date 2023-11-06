@@ -1,0 +1,35 @@
+# https://help.github.com/en/articles/metadata-syntax-for-github-actions
+name: 'sonarcloud swith quality gate action'
+description: "call the sonarcloud to swith the quality gate to tmp"
+author: 'thefork'
+inputs:
+  sonarcloud-token:
+    description: an admin token to select a quality gate on a project when running the CI
+    required: true
+    type: string
+  organization:
+    description: the organization defined on sonarcloud
+    required: true
+    type: string
+  project-key:
+    description: the project key when running the CI
+    required: true
+    type: string
+  tmp-gate-id:
+    description: the quality gate id to switch to temporarily before the sonarcloud analysis
+    required: true
+    type: string
+  pr-head-commit:
+    description: head commit of the pull request
+    required: true
+    type: string
+branding:
+  icon: 'anchor'
+  color: 'blue'
+outputs:
+  bypassed:
+    description: the quality gate has been bypassed
+runs:
+  using: 'node16'
+  main: 'dist/main/index.js'
+  post: 'dist/post/index.js'
