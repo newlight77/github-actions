@@ -73,12 +73,32 @@ runs:
         tmp-gate-id: "91010"
         pr-head-commit: ${{ github.event.pull_request.head.sha }}
 
+    - name: "sonar properties"
+      run: |
+        set +x
+        echo "::group::Sonar Configuration Before"
+
+        cat sonar-project.properties
+
+        echo "::endgroup::"
+      shell: bash
+
     - name: 'Normalize sonar propeties'
       id: sonar-properties
       uses: newlight77/github-actions/.github/actions/sonar-properties@main
       with:
         project-stack: ${{ inputs.project-stack }}
-        sonar-properties-path: ${{ inputs.project-stack }}
+        sonar-properties-path: ${{ inputs.sonar-properties-path }}
+
+    - name: "overriden sonar properties"
+      run: |
+        set +x
+        echo "::group::Sonar Configuration After"
+
+        cat sonar-project.properties
+
+        echo "::endgroup::"
+      shell: bash
 
     # - name: run sonarcloud action
     #   uses: SonarSource/sonarcloud-github-action@v2.0.0
