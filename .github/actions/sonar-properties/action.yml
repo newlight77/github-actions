@@ -7,6 +7,11 @@ inputs:
     description: the project stack (node | next | react | java | android | ios)
     required: true
     type: string
+  sonar-properties-path:
+    description: the project stack (node | next | react | java | android | ios)
+    required: true
+    type: string
+
 
 branding:
   icon: 'anchor'

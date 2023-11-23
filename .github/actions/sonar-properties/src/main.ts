@@ -21,7 +21,7 @@ export async function mergePropertiesFile(propPath: string, projectStack: string
 
 function run() {
     const projectStack: string = core.getInput('project-stack');
-    const propPath: string = core.getInput('php-path');
+    const propPath: string = core.getInput('sonar-properties-path');
     mergePropertiesFile(propPath, projectStack)
 }
 

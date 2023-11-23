@@ -9,12 +9,16 @@ on:
         required: false
         default: |
           default
+      sonar-properties-path:
+        description: path to the sonar-project.properties file
+        required: true
+        type: string
       slack-room-id:
         description: 'The Slack channel room id'
         type: string
         default: ''
         required: false
-
+      
 jobs:
   # display-variables:
   #   name: display ci variables
@@ -181,6 +185,7 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           project-stack: "node"
+          sonar-properties-path: ${{ inputs.sonar-properties-path }}
       
   # notify-slack:
   #   needs:

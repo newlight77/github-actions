@@ -18,6 +18,10 @@ inputs:
     description: the project stack (node | next | react | java | android | ios)
     required: true
     type: string
+  sonar-properties-path:
+    description: path to the sonar-project.properties file
+    required: true
+    type: string
 
 
 runs:
@@ -69,11 +73,12 @@ runs:
         tmp-gate-id: "91010"
         pr-head-commit: ${{ github.event.pull_request.head.sha }}
 
-    - name: 'select sonar properties'
+    - name: 'Normalize sonar propeties'
       id: sonar-properties
       uses: newlight77/github-actions/.github/actions/sonar-properties@main
       with:
         project-stack: ${{ inputs.project-stack }}
+        sonar-properties-path: ${{ inputs.project-stack }}
 
     # - name: run sonarcloud action
     #   uses: SonarSource/sonarcloud-github-action@v2.0.0
