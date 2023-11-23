@@ -25878,22 +25878,26 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.mergePropertiesFile = void 0;
 const core = __importStar(__nccwpck_require__(2186));
+const path = __importStar(__nccwpck_require__(1017));
 const policies_1 = __nccwpck_require__(4097);
 const prop_util_1 = __nccwpck_require__(2091);
-const templatesPath = '../../templates';
+let templatesPath = path.join(__dirname, '../../templates');
 async function mergePropertiesFile(propPath, projectStack) {
     const stack = (0, policies_1.ensureAllowedStack)(projectStack);
     const defaultProp = (0, prop_util_1.loadProperties)(templatesPath, 'default.properties');
-    core.info(`default.properties : ${defaultProp}`);
+    core.info(`default.properties : ${defaultProp.format()}`);
     const projectProp = (0, prop_util_1.loadProperties)(templatesPath, `${stack}.properties`);
-    core.info(`default.properties : ${projectProp}`);
+    core.info(`common ${stack}.properties : ${projectProp.format()}`);
     const mergedProp = (0, prop_util_1.mergeProperties)(defaultProp, projectProp);
+    core.info(`merged properties : ${mergedProp.format()}`);
     (0, prop_util_1.writeProperties)(propPath, 'sonar-project.properties', mergedProp);
+    core.info(`merged properties : ${propPath}/sonar-project.properties`);
 }
 exports.mergePropertiesFile = mergePropertiesFile;
 function run() {
     const projectStack = core.getInput('project-stack');
-    const propPath = core.getInput('php-path');
+    const propPath = core.getInput('sonar-properties-path');
+    core.info(`args : projectStack=${projectStack} propPath=${propPath}`);
     mergePropertiesFile(propPath, projectStack);
 }
 run();
@@ -25933,18 +25937,19 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.writeToFile = exports.loadFile = void 0;
 const fs = __importStar(__nccwpck_require__(7147));
 const path = __importStar(__nccwpck_require__(1017));
-function loadFile(relPath, filename) {
-    let filePath = path.join(__dirname, relPath, filename);
+const core = __importStar(__nccwpck_require__(2186));
+function loadFile(absPath, filename) {
+    let filePath = path.join(absPath, filename);
     if (!fs.existsSync(filePath)) {
-        console.warn("can not find file", `${relPath}/${filename}`);
-        console.warn("fallback to ", `${relPath}/empty.properties`);
+        core.info(`can not find file ${absPath}/${filename}`);
+        core.info(`fallback to ${absPath}/empty.properties`);
         return '# empty';
     }
     return fs.readFileSync(filePath).toString().replace('\\\n', '').replace('\\\n( )*', '');
 }
 exports.loadFile = loadFile;
 function writeToFile(relPath, filename, data) {
-    let filePath = path.join(__dirname, relPath, filename);
+    let filePath = path.join(relPath, filename);
     const content = data.split(',').join(',\\\n');
     fs.writeFileSync(filePath, content);
 }
@@ -25997,38 +26002,30 @@ function writeProperties(path, filename, properties) {
     (0, file_util_1.writeToFile)(path, filename, properties.format());
 }
 exports.writeProperties = writeProperties;
-function mergeProperties(baseProp, override) {
-    // const properties = new Properties(baseProp.format());
-    const resultingProperties = new editor_1.PropertiesEditor(baseProp.format());
+function mergeProperties(base, override) {
+    const mergedProperties = new editor_1.PropertiesEditor(base.format());
     override.collection.forEach((property) => {
-        const currentMatchedProp = baseProp.collection.find(p => p.key === property.key);
-        const mergedPropValue = mergeProperty(property.key, property.value, currentMatchedProp ? currentMatchedProp.value : undefined);
-        // if (currentMatchedProp) {
-        // properties.collection = properties.collection.filter(p => p.key !== currentMatchedProp.key)
-        // resultingProperties.delete(currentMatchedProp.key);
-        resultingProperties.upsert(property.key, mergedPropValue);
-        // }
-        // properties.collection.push(mergedProp);
-        // resultingProperties.insert(property.key, mergedPropValue);
+        const baseMatchedProp = base.collection.find(p => p.key === property.key);
+        const mergedPropValue = mergeProperty(property.key, property.value, baseMatchedProp ? baseMatchedProp.value : undefined);
+        mergedProperties.upsert(property.key, mergedPropValue);
     });
-    // return properties;
-    return resultingProperties;
+    return mergedProperties;
 }
 exports.mergeProperties = mergeProperties;
 /**
- *
- * @param property from project specific property, has higher order
- * @param currentBaseMatchedProp from common rules
+ * Merging common and project specific properties, the specific may override the base ones.
+ * @param specificValue of property from specific project, has higher order
+ * @param baseValue of property from common base rules
  * @returns
  */
-function mergeProperty(key, value, currentMatchedValue) {
-    let resultingValue = value;
-    if (!currentMatchedValue)
-        return value;
+function mergeProperty(key, specificValue, baseValue) {
+    let resultingValue = specificValue;
+    if (!baseValue)
+        return specificValue;
     if (key === 'sonar.exclusions' ||
         key === 'sonar.coverage.exclusions') {
-        const currentValues = currentMatchedValue.split(',');
-        const overrideValues = value.split(',');
+        const currentValues = baseValue.split(',');
+        const overrideValues = specificValue.split(',');
         currentValues.push(...overrideValues);
         const dedupValues = [...new Set(currentValues)];
         resultingValue = dedupValues.map(v => v.trim()).join(',');

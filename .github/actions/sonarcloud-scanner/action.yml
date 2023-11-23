@@ -75,9 +75,19 @@ runs:
 
     - name: "sonar properties"
       run: |
+        echo 
+        echo SONAR_PROP_PATH=$SONAR_PROP_PATH
+        pwd
+      shell: bash
+      env:
+        SONAR_PROP_PATH: ${{ inputs.sonar-properties-path }}
+
+    - name: "sonar properties"
+      run: |
         set +x
         echo "::group::Sonar Configuration Before"
 
+        pwd
         cat sonar-project.properties
 
         echo "::endgroup::"
@@ -95,9 +105,19 @@ runs:
         set +x
         echo "::group::Sonar Configuration After"
 
+        pwd
         cat sonar-project.properties
 
         echo "::endgroup::"
+      shell: bash
+
+    - name: "properties files location"
+      run: |
+        echo 
+        ls -la /home/runner/work/_actions/newlight77/github-actions/main/.github
+        ls -la /home/runner/work/_actions/newlight77/github-actions/main/.github/actions
+        ls -la /home/runner/work/_actions/newlight77/github-actions/main/.github/actions/sonar-properties
+        ls -la /home/runner/work/_actions/newlight77/github-actions/main/.github/actions/sonar-properties/templates
       shell: bash
 
     # - name: run sonarcloud action
