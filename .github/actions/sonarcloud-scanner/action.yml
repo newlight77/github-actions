@@ -18,10 +18,6 @@ inputs:
     description: the project stack (node | next | react | java | android | ios)
     required: true
     type: string
-  sonar-properties-path:
-    description: path to the sonar-project.properties file
-    required: true
-    type: string
 
 
 runs:
@@ -75,20 +71,11 @@ runs:
 
     - name: "sonar properties"
       run: |
-        echo 
-        echo SONAR_PROP_PATH=$SONAR_PROP_PATH
-        pwd
-      shell: bash
-      env:
-        SONAR_PROP_PATH: ${{ inputs.sonar-properties-path }}
-
-    - name: "sonar properties"
-      run: |
         set +x
         echo "::group::Sonar Configuration Before"
 
-        pwd
         cat sonar-project.properties
+        echo
 
         echo "::endgroup::"
       shell: bash
@@ -98,26 +85,16 @@ runs:
       uses: newlight77/github-actions/.github/actions/sonar-properties@main
       with:
         project-stack: ${{ inputs.project-stack }}
-        sonar-properties-path: ${{ inputs.sonar-properties-path }}
 
-    - name: "overriden sonar properties"
+    - name: "overridden sonar properties"
       run: |
         set +x
         echo "::group::Sonar Configuration After"
 
-        pwd
         cat sonar-project.properties
+        echo
 
         echo "::endgroup::"
-      shell: bash
-
-    - name: "properties files location"
-      run: |
-        echo 
-        ls -la /home/runner/work/_actions/newlight77/github-actions/main/.github
-        ls -la /home/runner/work/_actions/newlight77/github-actions/main/.github/actions
-        ls -la /home/runner/work/_actions/newlight77/github-actions/main/.github/actions/sonar-properties
-        ls -la /home/runner/work/_actions/newlight77/github-actions/main/.github/actions/sonar-properties/templates
       shell: bash
 
     # - name: run sonarcloud action

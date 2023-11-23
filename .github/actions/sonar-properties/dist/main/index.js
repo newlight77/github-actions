@@ -25885,18 +25885,18 @@ let templatesPath = path.join(__dirname, '/../templates');
 async function mergePropertiesFile(propPath, projectStack) {
     const stack = (0, policies_1.ensureAllowedStack)(projectStack);
     const stackProp = (0, prop_util_1.loadProperties)(templatesPath, `${stack}.properties`);
-    core.info(`common ${stack}.properties : ${stackProp.format()}`);
+    // core.info(`common ${stack}.properties : ${stackProp.format()}`);
     const projectProp = (0, prop_util_1.loadProperties)(propPath, 'sonar-project.properties');
-    core.info(`sonar-project.properties : ${projectProp.format()}`);
+    // core.info(`sonar-project.properties : ${projectProp.format()}`);
     const finalProp = (0, prop_util_1.mergeProperties)(stackProp, projectProp);
-    core.info(`final properties : ${finalProp.format()}`);
+    // core.info(`final properties : ${finalProp.format()}`);
     (0, prop_util_1.writeProperties)(propPath, 'sonar-project.properties', finalProp);
     core.info(`final properties : ${propPath}/sonar-project.properties`);
 }
 exports.mergePropertiesFile = mergePropertiesFile;
 function run() {
     const projectStack = core.getInput('project-stack');
-    const propPath = core.getInput('sonar-properties-path');
+    const propPath = '.';
     core.info(`args : projectStack=${projectStack} propPath=${propPath}`);
     mergePropertiesFile(propPath, projectStack);
 }

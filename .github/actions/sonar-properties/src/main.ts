@@ -9,13 +9,13 @@ export async function mergePropertiesFile(propPath: string, projectStack: string
     const stack = ensureAllowedStack(projectStack);
 
     const stackProp = loadProperties(templatesPath, `${stack}.properties`);
-    core.info(`common ${stack}.properties : ${stackProp.format()}`);
+    // core.info(`common ${stack}.properties : ${stackProp.format()}`);
 
     const projectProp = loadProperties(propPath, 'sonar-project.properties');
-    core.info(`sonar-project.properties : ${projectProp.format()}`);
+    // core.info(`sonar-project.properties : ${projectProp.format()}`);
 
     const finalProp = mergeProperties(stackProp, projectProp);
-    core.info(`final properties : ${finalProp.format()}`);
+    // core.info(`final properties : ${finalProp.format()}`);
 
     writeProperties(propPath, 'sonar-project.properties', finalProp)
     core.info(`final properties : ${propPath}/sonar-project.properties`);
@@ -23,7 +23,7 @@ export async function mergePropertiesFile(propPath: string, projectStack: string
 
 function run() {
     const projectStack: string = core.getInput('project-stack');
-    const propPath: string = core.getInput('sonar-properties-path');
+    const propPath = '.';
     core.info(`args : projectStack=${projectStack} propPath=${propPath}`);
     
     mergePropertiesFile(propPath, projectStack)
