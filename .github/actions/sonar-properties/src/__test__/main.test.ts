@@ -4,9 +4,9 @@ import { loadProperties } from '../properties/prop-util';
 
 describe("main merge properties file", () => {
 
-    it("should accept a valid stack", () => {
+    it("should merge properties file with project specific properties", () => {
         const projectStack = 'next';
-        const exportPath = '../..';
+        const exportPath = __dirname + '/../..';
 
         mergePropertiesFile(exportPath, projectStack);
 

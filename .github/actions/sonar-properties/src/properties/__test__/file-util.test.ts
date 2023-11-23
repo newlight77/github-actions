@@ -3,7 +3,7 @@ import { loadFile, writeToFile } from '../file-util';
 
 
 describe("file-util", () => {
-    const relPath = './__test__/templates';
+    const relPath = __dirname + '/templates';
 
     it("should load a valid properties file", () => {
         const propFile = 'test.properties';

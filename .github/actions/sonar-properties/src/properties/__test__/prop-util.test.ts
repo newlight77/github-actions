@@ -4,7 +4,7 @@ import { Properties } from 'properties-file';
 
 
 describe("pop-util : load properties", () => {
-    const templatesPath = './__test__/templates';
+    const templatesPath = __dirname + '/templates';
     it("should load a properties from valid file", () => {
         const propFile = 'test.properties';
 
@@ -27,7 +27,7 @@ describe("pop-util : load properties", () => {
 });
 
 describe("pop-util : write properties to file", () => {
-    const templatesPath = './__test__/templates';
+    const templatesPath = __dirname + '/templates';
     it("should load a properties from valid file", () => {
         const propFile = 'write-prop.properties';
         const properties = new Properties("write.prop=done");
@@ -43,7 +43,7 @@ describe("pop-util : write properties to file", () => {
 
 
 describe("pop-util : merge properties", () => {
-    const templatesPath = './__test__/templates';
+    const templatesPath = __dirname + '/templates';
 
     it("should override a property when having empty base", () => {
         const baseProperties = loadProperties(templatesPath, 'base.properties');

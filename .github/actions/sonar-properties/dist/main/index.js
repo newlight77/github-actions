@@ -25881,17 +25881,17 @@ const core = __importStar(__nccwpck_require__(2186));
 const path = __importStar(__nccwpck_require__(1017));
 const policies_1 = __nccwpck_require__(4097);
 const prop_util_1 = __nccwpck_require__(2091);
-let templatesPath = path.join(__dirname, '../../templates');
+let templatesPath = path.join(__dirname, '/../templates');
 async function mergePropertiesFile(propPath, projectStack) {
     const stack = (0, policies_1.ensureAllowedStack)(projectStack);
-    const defaultProp = (0, prop_util_1.loadProperties)(templatesPath, 'default.properties');
-    core.info(`default.properties : ${defaultProp.format()}`);
-    const projectProp = (0, prop_util_1.loadProperties)(templatesPath, `${stack}.properties`);
-    core.info(`common ${stack}.properties : ${projectProp.format()}`);
-    const mergedProp = (0, prop_util_1.mergeProperties)(defaultProp, projectProp);
-    core.info(`merged properties : ${mergedProp.format()}`);
-    (0, prop_util_1.writeProperties)(propPath, 'sonar-project.properties', mergedProp);
-    core.info(`merged properties : ${propPath}/sonar-project.properties`);
+    const stackProp = (0, prop_util_1.loadProperties)(templatesPath, `${stack}.properties`);
+    core.info(`common ${stack}.properties : ${stackProp.format()}`);
+    const projectProp = (0, prop_util_1.loadProperties)(propPath, 'sonar-project.properties');
+    core.info(`sonar-project.properties : ${projectProp.format()}`);
+    const finalProp = (0, prop_util_1.mergeProperties)(stackProp, projectProp);
+    core.info(`final properties : ${finalProp.format()}`);
+    (0, prop_util_1.writeProperties)(propPath, 'sonar-project.properties', finalProp);
+    core.info(`final properties : ${propPath}/sonar-project.properties`);
 }
 exports.mergePropertiesFile = mergePropertiesFile;
 function run() {
