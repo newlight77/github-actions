@@ -3,6 +3,12 @@ name: Default Node CI Workflow
 on:
   workflow_call:
     inputs:
+      slack-room-id:
+        description: the project stack (node | next | react | java | android | ios)
+        type: string
+        required: false
+        default: |
+          C05UA1LUW1H
       project-stack:
         description: the project stack (node | next | react | java | android | ios)
         type: string
