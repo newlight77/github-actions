@@ -25928,7 +25928,13 @@ let templatesPath = path.join(__dirname, '/../../templates');
 async function mergePropertiesFile(propPath, projectStack) {
     const stack = (0, stack_util_1.ensureAllowedStack)(projectStack);
     const stackProp = (0, prop_util_1.loadProperties)(templatesPath, `${stack}.properties`);
+    core.info(`stackProp properties : <`);
+    core.info(stackProp.format());
+    core.info(`stackProp properties : >`);
     const projectProp = (0, prop_util_1.loadProperties)(propPath, 'sonar-project.properties');
+    core.info(`projectProp properties : <`);
+    core.info(projectProp.format());
+    core.info(`projectProp properties : >`);
     const finalProp = mergeProperties(stackProp, projectProp);
     core.info(`final properties : <`);
     core.info(finalProp.format());
@@ -25942,7 +25948,7 @@ function mergeProperties(base, override) {
     override.collection.forEach((property) => {
         const baseMatchedProp = base.collection.find(p => p.key === property.key);
         const mergedPropValue = mergePropertyValue(property.key, property.value, baseMatchedProp ? baseMatchedProp.value : undefined);
-        core.info(`property key : ${property.key}=mergedPropValue`);
+        console.info(`property key : ${property.key}=${mergedPropValue}`);
         mergedProperties.upsert(property.key, mergedPropValue);
     });
     return mergedProperties;

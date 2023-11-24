@@ -11,8 +11,14 @@ export async function mergePropertiesFile(propPath: string, projectStack: string
     const stack = ensureAllowedStack(projectStack);
 
     const stackProp = loadProperties(templatesPath, `${stack}.properties`);
+    core.info(`stackProp properties : <`);
+    core.info(stackProp.format());
+    core.info(`stackProp properties : >`);
 
     const projectProp = loadProperties(propPath, 'sonar-project.properties');
+    core.info(`projectProp properties : <`);
+    core.info(projectProp.format());
+    core.info(`projectProp properties : >`);
 
     const finalProp = mergeProperties(stackProp, projectProp);
     core.info(`final properties : <`);
