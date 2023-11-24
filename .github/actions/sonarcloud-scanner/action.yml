@@ -69,18 +69,6 @@ runs:
         tmp-gate-id: "91010"
         pr-head-commit: ${{ github.event.pull_request.head.sha }}
 
-    - name: "sonar properties"
-      run: |
-        set +x
-        echo "::group::Sonar Configuration Before"
-
-        echo "--- beginning of properties file <"
-        cat sonar-project.properties
-        echo "--- end of properties file >"
-
-        echo "::endgroup::"
-      shell: bash
-
     - name: 'Normalize sonar propeties'
       id: sonar-properties
       uses: newlight77/github-actions/.github/actions/sonar-properties@main
@@ -92,9 +80,11 @@ runs:
         set +x
         echo "::group::Sonar Configuration After"
 
-        echo "--- beginning of properties file <"
+        echo "<--- beginning --->"
+        echo
         cat sonar-project.properties
-        echo "--- end of properties file >"
+        echo 
+        echo "<--- end --->"
 
         echo "::endgroup::"
       shell: bash
