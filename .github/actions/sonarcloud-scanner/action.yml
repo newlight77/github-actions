@@ -88,6 +88,14 @@ runs:
 
         echo "::endgroup::"
       shell: bash
+    
+    - name: upload merged sonar-project.properties
+      uses: actions/upload-artifact@v3
+      with:
+        name: merged-sonar-project.properties
+        path: |
+          sonar-project.properties
+        retention-days: 2
 
     # - name: run sonarcloud action
     #   uses: SonarSource/sonarcloud-github-action@v2.0.0
