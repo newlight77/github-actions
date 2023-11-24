@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { loadProperties } from '../util/prop-util';
-import { mergePropertiesFile } from '../prop-merger';
+import { mergeProperties, mergePropertiesFile } from '../prop-merger';
 
 
 describe("prop-merger : merge properties file", () => {
@@ -18,3 +18,41 @@ describe("prop-merger : merge properties file", () => {
   });
 });
 
+
+describe("prop-merger : merge properties", () => {
+  const templatesPath = __dirname + '/templates';
+
+  it("should override a property when having empty base", () => {
+      const baseProperties = loadProperties(templatesPath, 'base.properties');
+      const testProperties = loadProperties(templatesPath, 'test.properties');
+
+      // act
+      const merged = mergeProperties(baseProperties, testProperties);
+
+      // assert
+      expect(merged.format().includes('test.value')).to.eql(true);
+  });
+
+  it("should keep the base property when there is no property to override", () => {
+      const baseProperties = loadProperties(templatesPath, 'base.properties');
+      const testProperties = loadProperties(templatesPath, 'test.properties');
+
+      // act
+      const merged = mergeProperties(baseProperties, testProperties);
+
+      // assert
+      expect(merged.format().includes('base.value')).to.eql(true);
+  });
+
+
+  it("should override a multiple value property", () => {
+      const baseProperties = loadProperties(templatesPath, 'base.properties');
+      const testProperties = loadProperties(templatesPath, 'test.properties');
+
+      // act
+      const merged = mergeProperties(baseProperties, testProperties);
+
+      // assert
+      expect(merged.format().includes('value1, value2, value3, value4, value5')).to.eql(true);
+  });
+});

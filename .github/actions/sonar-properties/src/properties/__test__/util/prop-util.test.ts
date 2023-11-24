@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { Properties } from 'properties-file';
-import { writeProperties, loadProperties, mergeProperties } from '../../util/prop-util';
+import { writeProperties, loadProperties } from '../../util/prop-util';
 
 
 describe("prop-util : load properties", () => {
@@ -38,44 +38,5 @@ describe("pop-util : write properties to file", () => {
         const expected = loadProperties(templatesPath, propFile);
         const value = expected.collection.find(p => p.key === 'write.prop')!.value;
         expect(value).to.eql('done');
-    });
-});
-
-
-describe("pop-util : merge properties", () => {
-    const templatesPath = __dirname + '/../templates';
-
-    it("should override a property when having empty base", () => {
-        const baseProperties = loadProperties(templatesPath, 'base.properties');
-        const testProperties = loadProperties(templatesPath, 'test.properties');
-
-        // act
-        const merged = mergeProperties(baseProperties, testProperties);
-
-        // assert
-        expect(merged.format().includes('test.value')).to.eql(true);
-    });
-
-    it("should keep the base property when there is no property to override", () => {
-        const baseProperties = loadProperties(templatesPath, 'base.properties');
-        const testProperties = loadProperties(templatesPath, 'test.properties');
-
-        // act
-        const merged = mergeProperties(baseProperties, testProperties);
-
-        // assert
-        expect(merged.format().includes('base.value')).to.eql(true);
-    });
-
-
-    it("should override a multiple value property", () => {
-        const baseProperties = loadProperties(templatesPath, 'base.properties');
-        const testProperties = loadProperties(templatesPath, 'test.properties');
-
-        // act
-        const merged = mergeProperties(baseProperties, testProperties);
-
-        // assert
-        expect(merged.format().includes('value1, value2, value3, value4, value5')).to.eql(true);
     });
 });

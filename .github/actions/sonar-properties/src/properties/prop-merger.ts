@@ -29,7 +29,7 @@ export function mergeProperties(base: Properties, override: Properties): Propert
     override.collection.forEach((property) => {
         const baseMatchedProp = base.collection.find(p => p.key === property.key)
         const mergedPropValue = mergePropertyValue(property.key, property.value, baseMatchedProp ? baseMatchedProp.value : undefined);
-        core.info(`property key : ${property.key}=mergedPropValue`);
+        console.info(`property key : ${property.key}=${mergedPropValue}`);
         mergedProperties.upsert(property.key, mergedPropValue)
     });
 
