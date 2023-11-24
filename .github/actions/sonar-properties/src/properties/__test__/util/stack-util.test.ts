@@ -1,8 +1,8 @@
 import { expect } from 'chai';
-import { ensureAllowedStack } from '../policies';
+import { ensureAllowedStack } from '../../util/stack-util';
 
 
-describe("properties policies", () => {
+describe("stack-util", () => {
   it("should accept a valid stack", () => {
     const projectStack = 'node';
 

@@ -1,6 +1,7 @@
 import { Properties } from 'properties-file';
-import { backupFile, loadFile, writeToFile } from './file-util';
 import { PropertiesEditor } from 'properties-file/editor';
+import { backupFile, loadFile, writeToFile } from './file-util';
+import { mergePropertyValue } from '../prop-merger';
 
 export function loadProperties(templatesPath: string, filename: string): Properties {
     return new Properties(loadFile(templatesPath, filename));
@@ -29,24 +30,4 @@ export function mergeProperties(base: Properties, override: Properties): Propert
     return mergedProperties;
 }
 
-/**
- * Merging the common and project specific property values, the specific may override the base one.
- * @param specificValue of property from specific project, has higher order
- * @param baseValue of property from common base rules
- * @returns 
- */
-function mergePropertyValue(key: string, specificValue: string, baseValue?: string): string {
-    if (!baseValue) return specificValue;
-
-    if (key === 'sonar.exclusions' ||
-        key === 'sonar.coverage.exclusions') {
-        const currentValues: string[] = baseValue.split(',');
-        const overrideValues: string[] = specificValue.split(',');
-        currentValues.push(...overrideValues);
-        const dedupValues = [...new Set(currentValues)];
-        return dedupValues.map(v => v.trim()).join(', ');
-    }
-
-    return specificValue;
-}
 

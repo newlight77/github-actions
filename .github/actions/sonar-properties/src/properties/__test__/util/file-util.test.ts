@@ -1,9 +1,9 @@
 import { expect } from 'chai';
-import { loadFile, writeToFile } from '../file-util';
+import { loadFile, writeToFile } from '../../util/file-util';
 
 
-describe("file-util", () => {
-    const relPath = __dirname + '/templates';
+describe("file-util : load file", () => {
+    const relPath = __dirname + '/../templates';
 
     it("should load a valid properties file", () => {
         const propFile = 'test.properties';

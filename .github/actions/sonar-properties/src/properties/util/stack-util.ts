@@ -1,5 +1,3 @@
-import * as core from '@actions/core';
-
 enum ProjectStack {
     node = "node",
     next = "next",
@@ -10,6 +8,7 @@ enum ProjectStack {
 }
 
 export const ensureAllowedStack = (projectStack: string) => {
+
     if (projectStack in ProjectStack)
         return ProjectStack[projectStack];
 

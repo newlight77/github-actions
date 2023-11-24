@@ -1,10 +1,10 @@
 import { expect } from 'chai';
-import { writeProperties, loadProperties, mergeProperties } from '../prop-util';
 import { Properties } from 'properties-file';
+import { writeProperties, loadProperties, mergeProperties } from '../../util/prop-util';
 
 
-describe("pop-util : load properties", () => {
-    const templatesPath = __dirname + '/templates';
+describe("prop-util : load properties", () => {
+    const templatesPath = __dirname + '/../templates';
     it("should load a properties from valid file", () => {
         const propFile = 'test.properties';
 
@@ -27,7 +27,7 @@ describe("pop-util : load properties", () => {
 });
 
 describe("pop-util : write properties to file", () => {
-    const templatesPath = __dirname + '/templates';
+    const templatesPath = __dirname + '/../templates';
     it("should load a properties from valid file", () => {
         const propFile = 'write-prop.properties';
         const properties = new Properties("write.prop=done");
@@ -43,7 +43,7 @@ describe("pop-util : write properties to file", () => {
 
 
 describe("pop-util : merge properties", () => {
-    const templatesPath = __dirname + '/templates';
+    const templatesPath = __dirname + '/../templates';
 
     it("should override a property when having empty base", () => {
         const baseProperties = loadProperties(templatesPath, 'base.properties');
@@ -76,6 +76,6 @@ describe("pop-util : merge properties", () => {
         const merged = mergeProperties(baseProperties, testProperties);
 
         // assert
-        expect(merged.format().includes('value1,value2,value3,value4,value5')).to.eql(true);
+        expect(merged.format().includes('value1, value2, value3, value4, value5')).to.eql(true);
     });
 });

@@ -25876,14 +25876,56 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.mergePropertiesFile = void 0;
+const core = __importStar(__nccwpck_require__(2186));
+const prop_merger_1 = __nccwpck_require__(4422);
+function run() {
+    const projectStack = core.getInput('project-stack');
+    const propPath = '.';
+    core.info(`args : projectStack=${projectStack} propPath=${propPath}`);
+    (0, prop_merger_1.mergePropertiesFile)(propPath, projectStack);
+}
+run();
+
+
+/***/ }),
+
+/***/ 4422:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.mergePropertyValue = exports.mergePropertiesFile = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const path = __importStar(__nccwpck_require__(1017));
-const policies_1 = __nccwpck_require__(4097);
-const prop_util_1 = __nccwpck_require__(2091);
-let templatesPath = path.join(__dirname, '/../templates');
+const stack_util_1 = __nccwpck_require__(683);
+const prop_util_1 = __nccwpck_require__(4650);
+let templatesPath = path.join(__dirname, '/../../templates');
 async function mergePropertiesFile(propPath, projectStack) {
-    const stack = (0, policies_1.ensureAllowedStack)(projectStack);
+    const stack = (0, stack_util_1.ensureAllowedStack)(projectStack);
     const stackProp = (0, prop_util_1.loadProperties)(templatesPath, `${stack}.properties`);
     const projectProp = (0, prop_util_1.loadProperties)(propPath, 'sonar-project.properties');
     const finalProp = (0, prop_util_1.mergeProperties)(stackProp, projectProp);
@@ -25892,18 +25934,31 @@ async function mergePropertiesFile(propPath, projectStack) {
     core.info(`final properties : ${propPath}/sonar-project.properties`);
 }
 exports.mergePropertiesFile = mergePropertiesFile;
-function run() {
-    const projectStack = core.getInput('project-stack');
-    const propPath = '.';
-    core.info(`args : projectStack=${projectStack} propPath=${propPath}`);
-    mergePropertiesFile(propPath, projectStack);
+/**
+ * Merging the common and project specific property values, the specific may override the base one.
+ * @param specificValue of property from specific project, has higher order
+ * @param baseValue of property from common base rules
+ * @returns
+ */
+function mergePropertyValue(key, specificValue, baseValue) {
+    if (!baseValue)
+        return specificValue;
+    if (key === 'sonar.exclusions' ||
+        key === 'sonar.coverage.exclusions') {
+        const currentValues = baseValue.split(',');
+        const overrideValues = specificValue.split(',');
+        currentValues.push(...overrideValues);
+        const dedupValues = [...new Set(currentValues)];
+        return dedupValues.map(v => v.trim()).join(', ');
+    }
+    return specificValue;
 }
-run();
+exports.mergePropertyValue = mergePropertyValue;
 
 
 /***/ }),
 
-/***/ 973:
+/***/ 7468:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -25963,7 +26018,46 @@ exports.backupFile = backupFile;
 
 /***/ }),
 
-/***/ 4097:
+/***/ 4650:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.mergeProperties = exports.writeProperties = exports.loadProperties = void 0;
+const properties_file_1 = __nccwpck_require__(8380);
+const editor_1 = __nccwpck_require__(6818);
+const file_util_1 = __nccwpck_require__(7468);
+const prop_merger_1 = __nccwpck_require__(4422);
+function loadProperties(templatesPath, filename) {
+    return new properties_file_1.Properties((0, file_util_1.loadFile)(templatesPath, filename));
+}
+exports.loadProperties = loadProperties;
+function writeProperties(path, filename, properties, backup) {
+    if (backup) {
+        (0, file_util_1.backupFile)(path, filename)
+            .then(() => (0, file_util_1.writeToFile)(path, filename, properties.format()));
+    }
+    else {
+        (0, file_util_1.writeToFile)(path, filename, properties.format());
+    }
+}
+exports.writeProperties = writeProperties;
+function mergeProperties(base, override) {
+    const mergedProperties = new editor_1.PropertiesEditor(base.format());
+    override.collection.forEach((property) => {
+        const baseMatchedProp = base.collection.find(p => p.key === property.key);
+        const mergedPropValue = (0, prop_merger_1.mergePropertyValue)(property.key, property.value, baseMatchedProp ? baseMatchedProp.value : undefined);
+        mergedProperties.upsert(property.key, mergedPropValue);
+    });
+    return mergedProperties;
+}
+exports.mergeProperties = mergeProperties;
+
+
+/***/ }),
+
+/***/ 683:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -25985,63 +26079,6 @@ const ensureAllowedStack = (projectStack) => {
     return 'default';
 };
 exports.ensureAllowedStack = ensureAllowedStack;
-
-
-/***/ }),
-
-/***/ 2091:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.mergeProperties = exports.writeProperties = exports.loadProperties = void 0;
-const properties_file_1 = __nccwpck_require__(8380);
-const file_util_1 = __nccwpck_require__(973);
-const editor_1 = __nccwpck_require__(6818);
-function loadProperties(templatesPath, filename) {
-    return new properties_file_1.Properties((0, file_util_1.loadFile)(templatesPath, filename));
-}
-exports.loadProperties = loadProperties;
-function writeProperties(path, filename, properties, backup) {
-    if (backup) {
-        (0, file_util_1.backupFile)(path, filename)
-            .then(() => (0, file_util_1.writeToFile)(path, filename, properties.format()));
-    }
-    else {
-        (0, file_util_1.writeToFile)(path, filename, properties.format());
-    }
-}
-exports.writeProperties = writeProperties;
-function mergeProperties(base, override) {
-    const mergedProperties = new editor_1.PropertiesEditor(base.format());
-    override.collection.forEach((property) => {
-        const baseMatchedProp = base.collection.find(p => p.key === property.key);
-        const mergedPropValue = mergePropertyValue(property.key, property.value, baseMatchedProp ? baseMatchedProp.value : undefined);
-        mergedProperties.upsert(property.key, mergedPropValue);
-    });
-    return mergedProperties;
-}
-exports.mergeProperties = mergeProperties;
-/**
- * Merging the common and project specific property values, the specific may override the base one.
- * @param specificValue of property from specific project, has higher order
- * @param baseValue of property from common base rules
- * @returns
- */
-function mergePropertyValue(key, specificValue, baseValue) {
-    if (!baseValue)
-        return specificValue;
-    if (key === 'sonar.exclusions' ||
-        key === 'sonar.coverage.exclusions') {
-        const currentValues = baseValue.split(',');
-        const overrideValues = specificValue.split(',');
-        currentValues.push(...overrideValues);
-        const dedupValues = [...new Set(currentValues)];
-        return dedupValues.map(v => v.trim()).join(', ');
-    }
-    return specificValue;
-}
 
 
 /***/ }),

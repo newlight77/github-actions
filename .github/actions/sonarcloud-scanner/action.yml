@@ -91,6 +91,7 @@ runs:
         set +x
         echo "::group::Sonar Configuration After"
 
+        ls -la
         cat sonar-project.properties
         echo
 
