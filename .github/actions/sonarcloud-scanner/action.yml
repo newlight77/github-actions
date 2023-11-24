@@ -75,6 +75,32 @@ runs:
       with:
         project-stack: ${{ inputs.project-stack }}
 
+    - name: "override project specific properties"
+      run: |
+        set +x
+        sed -i '/sonar.projectKey=/d' sonar-project.properties
+        sed -i '/sonar.host.url=/d' sonar-project.properties
+        sed -i '/sonar.projectName=/d' sonar-project.properties
+        sed -i '/sonar.projectVersion=/d' sonar-project.properties
+        sed -i '/sonar.pullrequest.github.repository=/d' sonar-project.properties
+        sed -i '/sonar.pullrequest.provider=/d' sonar-project.properties
+        sed -i '/sonar.organization=/d' sonar-project.properties
+
+        echo "" >> sonar-project.properties
+        echo "sonar.organization=thefork" >> sonar-project.properties
+        echo "sonar.pullrequest.provider=github" >> sonar-project.properties
+
+        echo "sonar.projectName=${{ github.event.repository.name }}" >> sonar-project.properties
+        echo "sonar.projectKey=lafourchette_${{ github.event.repository.name }}" >> sonar-project.properties
+        echo "sonar.pullrequest.github.repository=lafourchette/${{ github.event.repository.name }}" >> sonar-project.properties
+
+        echo "::group::Sonar Configuration"
+
+        cat sonar-project.properties
+
+        echo "::endgroup::"
+      shell: bash
+
     - name: "overridden sonar properties"
       run: |
         set +x
