@@ -9,15 +9,13 @@ export async function mergePropertiesFile(propPath: string, projectStack: string
     const stack = ensureAllowedStack(projectStack);
 
     const stackProp = loadProperties(templatesPath, `${stack}.properties`);
-    // core.info(`common ${stack}.properties : ${stackProp.format()}`);
 
     const projectProp = loadProperties(propPath, 'sonar-project.properties');
-    // core.info(`sonar-project.properties : ${projectProp.format()}`);
 
     const finalProp = mergeProperties(stackProp, projectProp);
-    // core.info(`final properties : ${finalProp.format()}`);
+    core.info(`final properties : ${finalProp.format()}`);
 
-    writeProperties(propPath, 'sonar-project.properties', finalProp)
+    writeProperties(propPath, 'sonar-project.properties', finalProp, true);
     core.info(`final properties : ${propPath}/sonar-project.properties`);
 }
 
