@@ -8,8 +8,9 @@ describe("prop-merger : merge properties file", () => {
   it("should merge properties file with project specific properties", () => {
       const projectStack = 'node';
       const propPath = __dirname + '/../../..';
+      const propFilename = 'sonar-project.properties';
 
-      mergePropertiesFile(propPath, projectStack);
+      mergePropertiesFile(propPath, propFilename, projectStack);
 
       const properties = loadProperties(propPath, 'sonar-project.properties');
 

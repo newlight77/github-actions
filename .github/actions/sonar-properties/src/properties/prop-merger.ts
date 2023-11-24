@@ -7,30 +7,32 @@ import { PropertiesEditor } from 'properties-file/editor';
 
 let templatesPath = path.join(__dirname, '/../../templates');
 
-export async function mergePropertiesFile(propPath: string, projectStack: string) {
+export function mergePropertiesFile(propPath: string, propFilename: string, projectStack: string): Properties {
     const stack = ensureAllowedStack(projectStack);
 
     const stackProp = loadProperties(templatesPath, `${stack}.properties`);
 
-    const projectProp = loadProperties(propPath, 'sonar-project.properties');
+    const projectProp = loadProperties(propPath, propFilename);
 
     const finalProp = mergeProperties(stackProp, projectProp);
 
-    writeProperties(propPath, 'sonar-project.properties', finalProp, true);
+    writeProperties(propPath, propFilename, finalProp, true);
+
+    return finalProp;
 }
 
 export function mergeProperties(base: Properties, override: Properties): Properties {
     const mergedProperties = new PropertiesEditor(base.format())
-    core.info(`<---merging properties : --->\n`);
+    core.info(`\n::group::<---merging properties : --->\n`);
 
     override.collection.forEach((property) => {
         const baseMatchedProp = base.collection.find(p => p.key === property.key)
         const mergedPropValue = mergePropertyValue(property.key, property.value, baseMatchedProp ? baseMatchedProp.value : undefined);
-        console.info(`property : ${property.key}=${mergedPropValue}`);
+        core.info(`property : ${property.key}=${mergedPropValue}`);
         mergedProperties.upsert(property.key, mergedPropValue)
     });
 
-    core.info(`\n<---merging properties : --->`);
+    core.info(`\n::endgroup::<---merging properties : --->\n`);
 
     return mergedProperties;
 }

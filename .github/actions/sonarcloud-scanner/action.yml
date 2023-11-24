@@ -95,6 +95,8 @@ runs:
         name: merged-sonar-project.properties
         path: |
           sonar-project.properties
+          sonar.exclusions
+          sonar.coverage.exclusions
         retention-days: 2
 
     # - name: run sonarcloud action

@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { ensureAllowedStack } from '../../util/stack-util';
+import { ensureAllowedStack } from '../../../util/stack-util';
 
 
 describe("stack-util", () => {

@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { loadFile, writeToFile } from '../../util/file-util';
+import { loadFile, writeToFile } from '../../../util/file-util';
 
 
 describe("file-util : load file", () => {
