@@ -1,6 +1,6 @@
 import * as core from '@actions/core';
 import * as path from 'path';
-import { ensureAllowedStack } from './util/stack-util';
+import { ensureAllowedStack } from '../util/stack-util';
 import { loadProperties, writeProperties } from './util/prop-util';
 import { Properties } from 'properties-file';
 import { PropertiesEditor } from 'properties-file/editor';

@@ -1,5 +1,5 @@
 import { Properties } from 'properties-file';
-import { backupFile, loadFile, writeToFile } from './file-util';
+import { backupFile, loadFile, writeToFile } from '../../util/file-util';
 
 export function loadProperties(templatesPath: string, filename: string): Properties {
     return new Properties(loadFile(templatesPath, filename));
