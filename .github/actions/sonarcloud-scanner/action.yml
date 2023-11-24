@@ -74,8 +74,9 @@ runs:
         set +x
         echo "::group::Sonar Configuration Before"
 
+        echo "--- beginning of properties file <"
         cat sonar-project.properties
-        echo
+        echo "--- end of properties file >"
 
         echo "::endgroup::"
       shell: bash
@@ -91,9 +92,9 @@ runs:
         set +x
         echo "::group::Sonar Configuration After"
 
-        ls -la
+        echo "--- beginning of properties file <"
         cat sonar-project.properties
-        echo
+        echo "--- end of properties file >"
 
         echo "::endgroup::"
       shell: bash

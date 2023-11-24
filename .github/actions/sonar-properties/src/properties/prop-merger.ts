@@ -13,7 +13,9 @@ export async function mergePropertiesFile(propPath: string, projectStack: string
     const projectProp = loadProperties(propPath, 'sonar-project.properties');
 
     const finalProp = mergeProperties(stackProp, projectProp);
-    core.info(`final properties : ${finalProp.format()}`);
+    core.info(`final properties : <`);
+    core.info(finalProp.format());
+    core.info(`final properties : >`);
 
     writeProperties(propPath, 'sonar-project.properties', finalProp, true);
     core.info(`final properties : ${propPath}/sonar-project.properties`);

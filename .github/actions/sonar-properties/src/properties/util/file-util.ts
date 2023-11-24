@@ -10,9 +10,9 @@ export function loadFile(absPath: string, filename: string): string {
     if (!fs.existsSync(filePath)) {
         core.info(`can not find file ${absPath}/${filename}`);
         core.info(`fallback to ${absPath}/empty.properties`);
-        return '# empty';
+        return '# empty\n';
     }
-    return fs.readFileSync(filePath).toString().replace('\\\n( )*', '');
+    return fs.readFileSync(filePath).toString().replace('\\\n( )*', ' ');
 }
 
 export function writeToFile(relPath: string, filename: string, data: string) {
