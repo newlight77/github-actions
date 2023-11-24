@@ -25918,22 +25918,36 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.mergePropertyValue = exports.mergePropertiesFile = void 0;
+exports.mergePropertyValue = exports.mergeProperties = exports.mergePropertiesFile = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const path = __importStar(__nccwpck_require__(1017));
 const stack_util_1 = __nccwpck_require__(683);
 const prop_util_1 = __nccwpck_require__(4650);
+const editor_1 = __nccwpck_require__(6818);
 let templatesPath = path.join(__dirname, '/../../templates');
 async function mergePropertiesFile(propPath, projectStack) {
     const stack = (0, stack_util_1.ensureAllowedStack)(projectStack);
     const stackProp = (0, prop_util_1.loadProperties)(templatesPath, `${stack}.properties`);
     const projectProp = (0, prop_util_1.loadProperties)(propPath, 'sonar-project.properties');
-    const finalProp = (0, prop_util_1.mergeProperties)(stackProp, projectProp);
-    core.info(`final properties : ${finalProp.format()}`);
+    const finalProp = mergeProperties(stackProp, projectProp);
+    core.info(`final properties : <`);
+    core.info(finalProp.format());
+    core.info(`final properties : >`);
     (0, prop_util_1.writeProperties)(propPath, 'sonar-project.properties', finalProp, true);
     core.info(`final properties : ${propPath}/sonar-project.properties`);
 }
 exports.mergePropertiesFile = mergePropertiesFile;
+function mergeProperties(base, override) {
+    const mergedProperties = new editor_1.PropertiesEditor(base.format());
+    override.collection.forEach((property) => {
+        const baseMatchedProp = base.collection.find(p => p.key === property.key);
+        const mergedPropValue = mergePropertyValue(property.key, property.value, baseMatchedProp ? baseMatchedProp.value : undefined);
+        core.info(`property key : ${property.key}=mergedPropValue`);
+        mergedProperties.upsert(property.key, mergedPropValue);
+    });
+    return mergedProperties;
+}
+exports.mergeProperties = mergeProperties;
 /**
  * Merging the common and project specific property values, the specific may override the base one.
  * @param specificValue of property from specific project, has higher order
@@ -25998,9 +26012,9 @@ function loadFile(absPath, filename) {
     if (!fs.existsSync(filePath)) {
         core.info(`can not find file ${absPath}/${filename}`);
         core.info(`fallback to ${absPath}/empty.properties`);
-        return '# empty';
+        return '# empty\n';
     }
-    return fs.readFileSync(filePath).toString().replace('\\\n( )*', '');
+    return fs.readFileSync(filePath).toString().replace('\\\n( )*', ' ');
 }
 exports.loadFile = loadFile;
 function writeToFile(relPath, filename, data) {
@@ -26024,11 +26038,9 @@ exports.backupFile = backupFile;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.mergeProperties = exports.writeProperties = exports.loadProperties = void 0;
+exports.writeProperties = exports.loadProperties = void 0;
 const properties_file_1 = __nccwpck_require__(8380);
-const editor_1 = __nccwpck_require__(6818);
 const file_util_1 = __nccwpck_require__(7468);
-const prop_merger_1 = __nccwpck_require__(4422);
 function loadProperties(templatesPath, filename) {
     return new properties_file_1.Properties((0, file_util_1.loadFile)(templatesPath, filename));
 }
@@ -26043,16 +26055,6 @@ function writeProperties(path, filename, properties, backup) {
     }
 }
 exports.writeProperties = writeProperties;
-function mergeProperties(base, override) {
-    const mergedProperties = new editor_1.PropertiesEditor(base.format());
-    override.collection.forEach((property) => {
-        const baseMatchedProp = base.collection.find(p => p.key === property.key);
-        const mergedPropValue = (0, prop_merger_1.mergePropertyValue)(property.key, property.value, baseMatchedProp ? baseMatchedProp.value : undefined);
-        mergedProperties.upsert(property.key, mergedPropValue);
-    });
-    return mergedProperties;
-}
-exports.mergeProperties = mergeProperties;
 
 
 /***/ }),
