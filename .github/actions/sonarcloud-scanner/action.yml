@@ -78,13 +78,13 @@ runs:
     - name: "override project specific properties"
       run: |
         set +x
-        sed -i '/sonar.projectKey=/d' sonar-project.properties
-        sed -i '/sonar.host.url=/d' sonar-project.properties
-        sed -i '/sonar.projectName=/d' sonar-project.properties
-        sed -i '/sonar.projectVersion=/d' sonar-project.properties
-        sed -i '/sonar.pullrequest.github.repository=/d' sonar-project.properties
-        sed -i '/sonar.pullrequest.provider=/d' sonar-project.properties
-        sed -i '/sonar.organization=/d' sonar-project.properties
+        sed -i '/sonar.projectKey=( )*/d' sonar-project.properties
+        sed -i '/sonar.host.url=( )*/d' sonar-project.properties
+        sed -i '/sonar.projectName=( )*/d' sonar-project.properties
+        sed -i '/sonar.projectVersion=( )*/d' sonar-project.properties
+        sed -i '/sonar.pullrequest.github.repository=( )*/d' sonar-project.properties
+        sed -i '/sonar.pullrequest.provider=( )*/d' sonar-project.properties
+        sed -i '/sonar.organization=( )*/d' sonar-project.properties
 
         echo "" >> sonar-project.properties
         echo "sonar.organization=thefork" >> sonar-project.properties
@@ -121,6 +121,13 @@ runs:
         name: merged-sonar-project.properties
         path: |
           sonar-project.properties
+        retention-days: 2
+
+    - name: upload sonar exclusions report
+      uses: actions/upload-artifact@v3
+      with:
+        name: sonar-exclusions-report
+        path: |
           sonar.exclusions
           sonar.coverage.exclusions
         retention-days: 2

@@ -52,7 +52,9 @@ export function mergePropertyValue(key: string, specificValue: string, baseValue
         const overrideValues: string[] = specificValue.split(',');
         currentValues.push(...overrideValues);
         const dedupValues = [...new Set(currentValues)];
-        return dedupValues.map(v => v.trim()).join(', ');
+        return dedupValues.map(v => v.trim())
+            .filter(p => p && p !== '')
+            .join(', ');
     }
 
     return specificValue;

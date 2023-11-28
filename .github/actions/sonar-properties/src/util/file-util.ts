@@ -12,13 +12,12 @@ export function loadFile(absPath: string, filename: string): string {
         core.info(`fallback to ${absPath}/empty.properties`);
         return '# empty\n';
     }
-    return fs.readFileSync(filePath).toString().replace('\\\n( )*', ' ');
+    return fs.readFileSync(filePath).toString();
 }
 
 export function writeToFile(relPath: string, filename: string, data: string) {
     let filePath = path.join(relPath, filename);
-    const content = data.split(', ').join(',\\\n    ');
-    fs.writeFileSync(filePath, content);
+    fs.writeFileSync(filePath, data);
 }
 
 export function backupFile(relPath: string, filename: string): Promise<void> {
