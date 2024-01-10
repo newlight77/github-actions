@@ -65,7 +65,7 @@ runs:
       with:
         sonarcloud-token: ${{ env.SONAR_TOKEN }}
         organization: "thefork"
-        projectKey: "monorepo-github-actions"
+        project-key: "monorepo-github-actions"
         tmp-gate-id: "91010"
         pr-head-commit: ${{ github.event.pull_request.head.sha }}
 

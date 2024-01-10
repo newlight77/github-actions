@@ -9,7 +9,8 @@ async function run() {
     const gateId: string = core.getInput('tmp-gate-id');
     const headCommit: string= core.getInput('pr-head-commit');
 
-    const headCommitMessage: string = await getHeadCommitMessage(headCommit);
+    const patternOfCommitToSkip = "Merge branch 'master' into";
+    const headCommitMessage: string = await getHeadCommitMessage(headCommit, patternOfCommitToSkip);
     core.saveState('head-commit-message', headCommitMessage);
 
     if (!headCommitMessage.includes('[bypass quality-gate]')) {
@@ -17,10 +18,10 @@ async function run() {
         return;
     }
 
-    const currentGate = await getGateByProject(sonarToken, organization, projectKey);
-    core.saveState('current-gate-id', currentGate.id);
+    // const currentGate = await getGateByProject(sonarToken, organization, projectKey);
+    // core.saveState('current-gate-id', currentGate.id);
 
-    selectGate(sonarToken, organization, projectKey, gateId);
+    // selectGate(sonarToken, organization, projectKey, gateId);
     core.setOutput('bypassed', 'true');
 }
 
