@@ -1,0 +1,18 @@
+name: 'Select sonar properties rules according to the project stack before code analysis'
+description: "An action to select sonar properties"
+author: 'newlight77'
+
+inputs:
+  project-stack:
+    description: the project stack (node | next | react | java | android | ios)
+    required: true
+    type: string
+    default: php
+
+branding:
+  icon: 'anchor'
+  color: 'blue'
+
+runs:
+  using: 'node20'
+  main: 'dist/main/index.js'

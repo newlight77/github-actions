@@ -36,12 +36,6 @@ runs:
       with:
         persist-credentials: false
         fetch-depth: 0
-    - name: download coverage from unit tests
-      uses: actions/download-artifact@v3
-      id: download-coverage-from-unit-tests
-      with:
-        name: coverage-from-unit-tests
-      continue-on-error: true
     - name: install pnpm
       uses: pnpm/action-setup@v2
       with:
@@ -55,82 +49,36 @@ runs:
     - name : install dependencies
       run: make install-offline
       shell: bash
+
+    - name: download coverage from unit tests
+      uses: actions/download-artifact@v3
+      id: download-coverage-from-unit-tests
+      with:
+        name: coverage-from-unit-tests
+      continue-on-error: true
     - name : prepare and merge coverage files
       run: make merge-coverage
       shell: bash
+
+    - name: 'Normalize sonar propeties'
+      id: sonar-properties
+      uses: newlight77/github-actions/.github/actions/sonar-properties-normalize@main
+      with:
+        project-stack: ${{ inputs.project-stack }}
+
+    - name: 'Sonar exclusions report'
+      id: sonar-exclusions-report
+      uses: newlight77/github-actions/.github/actions/sonar-exclusions-report@main
 
     - name: '[bypass quality-gate], if set'
       id: bypass-quality-gate
       uses: newlight77/github-actions/.github/actions/sonarcloud-quality-gate-switch@main
       with:
         sonarcloud-token: ${{ env.SONAR_TOKEN }}
-        organization: "thefork"
+        organization: "newlight77"
         project-key: "monorepo-github-actions"
         tmp-gate-id: "91010"
         pr-head-commit: ${{ github.event.pull_request.head.sha }}
-
-    - name: 'Normalize sonar propeties'
-      id: sonar-properties
-      uses: newlight77/github-actions/.github/actions/sonar-properties@main
-      with:
-        project-stack: ${{ inputs.project-stack }}
-
-    - name: "override project specific properties"
-      run: |
-        set +x
-        sed -i '/sonar.projectKey=( )*/d' sonar-project.properties
-        sed -i '/sonar.host.url=( )*/d' sonar-project.properties
-        sed -i '/sonar.projectName=( )*/d' sonar-project.properties
-        sed -i '/sonar.projectVersion=( )*/d' sonar-project.properties
-        sed -i '/sonar.pullrequest.github.repository=( )*/d' sonar-project.properties
-        sed -i '/sonar.pullrequest.provider=( )*/d' sonar-project.properties
-        sed -i '/sonar.organization=( )*/d' sonar-project.properties
-
-        echo "" >> sonar-project.properties
-        echo "sonar.organization=thefork" >> sonar-project.properties
-        echo "sonar.pullrequest.provider=github" >> sonar-project.properties
-
-        echo "sonar.projectName=${{ github.event.repository.name }}" >> sonar-project.properties
-        echo "sonar.projectKey=lafourchette_${{ github.event.repository.name }}" >> sonar-project.properties
-        echo "sonar.pullrequest.github.repository=lafourchette/${{ github.event.repository.name }}" >> sonar-project.properties
-
-        echo "::group::Sonar Configuration"
-
-        cat sonar-project.properties
-
-        echo "::endgroup::"
-      shell: bash
-
-    - name: "overridden sonar properties"
-      run: |
-        set +x
-        echo "::group::Sonar Configuration After"
-
-        echo "<--- beginning --->"
-        echo
-        cat sonar-project.properties
-        echo 
-        echo "<--- end --->"
-
-        echo "::endgroup::"
-      shell: bash
-    
-    - name: upload merged sonar-project.properties
-      uses: actions/upload-artifact@v3
-      with:
-        name: merged-sonar-project.properties
-        path: |
-          sonar-project.properties
-        retention-days: 2
-
-    - name: upload sonar exclusions report
-      uses: actions/upload-artifact@v3
-      with:
-        name: sonar-exclusions-report
-        path: |
-          sonar.exclusions
-          sonar.coverage.exclusions
-        retention-days: 2
 
     # - name: run sonarcloud action
     #   uses: SonarSource/sonarcloud-github-action@v2.0.0

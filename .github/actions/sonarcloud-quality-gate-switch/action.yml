@@ -1,7 +1,8 @@
 # https://help.github.com/en/articles/metadata-syntax-for-github-actions
 name: 'sonarcloud swith quality gate action'
 description: "call the sonarcloud to swith the quality gate to tmp"
-author: 'thefork'
+author: 'newlight77'
+
 inputs:
   sonarcloud-token:
     description: an admin token to select a quality gate on a project when running the CI

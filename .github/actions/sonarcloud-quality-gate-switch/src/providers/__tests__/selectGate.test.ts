@@ -19,6 +19,6 @@ describe("select quality gate", () => {
     const { name } = await getGateByProject(sonarToken, organization, projectKey);
     console.log(name);
 
-    expect(name).to.eql('TheFork Way (Terraform) - exclusion');
+    expect(name).to.eql('newlight77 Way (Terraform) - exclusion');
   });
 });
