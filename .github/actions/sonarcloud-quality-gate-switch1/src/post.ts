@@ -11,9 +11,9 @@ async function run() {
         return;
     }
 
-    const currentGateId = core.getState('current-gate-id');
+    // const currentGateId = core.getState('current-gate-id');
 
-    selectGate(sonarToken, organization, projectKey, currentGateId);
+    // selectGate(sonarToken, organization, projectKey, currentGateId);
 }
 
 run();

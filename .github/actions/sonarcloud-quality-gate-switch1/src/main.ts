@@ -18,10 +18,10 @@ async function run() {
         return;
     }
 
-    const currentGate = await getGateByProject(sonarToken, organization, projectKey);
-    core.saveState('current-gate-id', currentGate.id);
+    // const currentGate = await getGateByProject(sonarToken, organization, projectKey);
+    // core.saveState('current-gate-id', currentGate.id);
 
-    selectGate(sonarToken, organization, projectKey, gateId);
+    // selectGate(sonarToken, organization, projectKey, gateId);
     core.setOutput('bypassed', 'true');
 }
 

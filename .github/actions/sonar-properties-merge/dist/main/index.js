@@ -26581,12 +26581,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ensureAllowedStack = void 0;
 var ProjectStack;
 (function (ProjectStack) {
-    ProjectStack["android"] = "android";
-    ProjectStack["ios"] = "ios";
-    ProjectStack["java"] = "java";
     ProjectStack["next"] = "next";
     ProjectStack["node"] = "node";
-    ProjectStack["php"] = "php";
     ProjectStack["react"] = "react";
 })(ProjectStack || (ProjectStack = {}));
 const ensureAllowedStack = (projectStack) => {

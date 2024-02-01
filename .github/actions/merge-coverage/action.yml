@@ -1,0 +1,56 @@
+name: 'Merge coverage files into one. All coverage files must be under ./**/coverage'
+description: "An action to merge coverage files into coverage/lcov.info. All coverage files must be under ./**/coverage"
+
+inputs:
+  with-unit-test:
+    description: 'with unit-test'
+    required: false
+    default: 'true'
+  with-feature-test:
+    description: 'with feature-test'
+    required: false
+    default: 'true'
+
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: 'install node, pnpm and dependencies'
+      id: install-pnpm-dependencies
+      uses: newlight77/github-actions/.github/actions/install-pnpm-dependencies@main
+
+    - name : install dependencies
+      run: npm install nyc -g --workspace-root
+      shell: bash
+
+    - name : list all coverage files before merge
+      if: inputs.with-unit-test == 'true'
+      run: |
+        echo "::group::coverage files before merge"
+        export LC_ALL=C
+
+        find ./ -type d -name node_modules -prune \
+          -o -regextype posix-extended -regex "(.*/)?coverage/(.*)?(lcov.*.info|coverage.*.json|report.*.xml)" \
+          -print
+
+        echo "::endgroup::"
+      shell: bash
+      continue-on-error: true
+
+    - name: merge unit-test coverage into coverage/merge/coverage-unit-merged.json
+      if: inputs.with-unit-test == 'true'
+      run: |
+        nyc merge coverage/unit coverage/merged/coverage-unit-merged.json
+      shell: bash
+
+    - name: merge feature-test coverage into coverage/merged/coverage-features-merged.json 
+      if: inputs.with-feature-test == 'true'
+      run: |
+        nyc merge coverage/feature coverage/merged/coverage-features-merged.json 
+      shell: bash
+
+    - name: convert merged coverage into coverage/lcov.info
+      run: |
+        nyc report --temp-dir ./coverage/merged --reporter=lcov --report-dir coverage
+      shell: bash

@@ -1,18 +1,17 @@
-name: 'Run code analysis'
-description: "An action to run the code analysis"
+name: 'Normalize sonar properties depending on the stack'
+description: "An action to normalize sonar properties depending on the stack"
 
 inputs:
   project-stack:
     description: the project stack (node | front | java | android | ios)
     required: true
-    type: string
 
 runs:
   using: "composite"
   steps:
     - name: 'Normalize sonar properties'
       id: sonar-properties
-      uses: newlight77/github-actions/.github/actions/sonar-properties-merge@v1
+      uses: newlight77/github-actions/.github/actions/sonar-properties-merge@main
       with:
         project-stack: ${{ inputs.project-stack }}
     - name: "override project specific properties"

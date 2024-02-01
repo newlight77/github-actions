@@ -1,5 +1,5 @@
-name: 'Select sonar properties rules according to the project stack before code analysis'
-description: "An action to select sonar properties"
+name: 'Apply the sonar exclusion properties and report files being excluded'
+description: "An action to apply the sonar exclusion properties and report files being excluded"
 author: 'newlight77'
 
 branding:

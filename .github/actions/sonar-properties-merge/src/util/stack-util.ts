@@ -1,10 +1,6 @@
 enum ProjectStack {
-    android = "android",
-    ios = "ios",
-    java = "java",
     next = "next",
     node = "node",
-    php = "php",
     react = "react"
 }
 

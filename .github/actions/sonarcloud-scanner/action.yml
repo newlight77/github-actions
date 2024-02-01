@@ -1,23 +1,16 @@
-name: 'Run code analysis'
-description: "An action to run the code analysis"
+name: 'Run code analysis with sonar (coverage and static code analysis)'
+description: "An action to run the code analysis with sonar (coverage and static code analysis)"
 
 inputs:
-  SONARCLOUD_ADMIN_TOKEN:
-    description: an admin token to select a quality gate on a project when running the CI
-    required: true
-    type: string
-  SONAR_TOKEN:
+  sonar-token:
     description: a token to publish metrics
     required: true
-    type: string
-  SLACK_BOT_TOKEN:
-    description: a token to publish metrics
+  slack-bot-token:
+    description: a token to sent notification on slack
     required: true
-    type: string
   project-stack:
-    description: the project stack (node | next | react | java | android | ios)
+    description: the project stack (node | next | react)
     required: true
-    type: string
 
 
 runs:
@@ -25,44 +18,34 @@ runs:
   steps:
     - name: Use variables
       run: |
-        echo "SONARCLOUD_ADMIN_TOKEN : $SONARCLOUD_ADMIN_TOKEN"
         echo "SONAR_TOKEN : $SONAR_TOKEN"
       env:
-        SONARCLOUD_ADMIN_TOKEN: ${{ inputs.SONARCLOUD_ADMIN_TOKEN }}
-        SONAR_TOKEN: ${{ inputs.SONAR_TOKEN }}
+        SONAR_TOKEN: ${{ inputs.sonar-token }}
       shell: bash
+
     - name: checkout 🛎️
       uses: actions/checkout@v3
       with:
         persist-credentials: false
         fetch-depth: 0
-    - name: install pnpm
-      uses: pnpm/action-setup@v2
-      with:
-        version: 8
-        run_install: false
-    - name: set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'
-        cache: 'pnpm'
-    - name : install dependencies
-      run: make install-offline
-      shell: bash
 
-    - name: download coverage from unit tests
-      uses: actions/download-artifact@v3
-      id: download-coverage-from-unit-tests
+    - name: 'Download coverage from multiple test suites'
+      id: download-all-coverage
+      uses: newlight77/github-actions/.github/actions/download-all-coverage@main
       with:
-        name: coverage-from-unit-tests
-      continue-on-error: true
-    - name : prepare and merge coverage files
-      run: make merge-coverage
-      shell: bash
+        with-unit-test: ${{ inputs.with-unit-test }}
+        with-feature-test: ${{ inputs.with-feature-test }}
 
-    - name: 'Normalize sonar propeties'
-      id: sonar-properties
-      uses: newlight77/github-actions/.github/actions/sonar-properties-normalize@main
+    - name: 'Merge coverage from multiple test suites'
+      id: merge-coverage
+      uses: newlight77/github-actions/.github/actions/merge-coverage@main
+      with:
+        with-unit-test: ${{ inputs.with-unit-test }}
+        with-feature-test: ${{ inputs.with-feature-test }}
+
+    - name: 'Normalize sonar properties'
+      id: normalize-sonar-properties
+      uses: newlight77/github-actions/.github/actions/sonar-properties-normalizer@main
       with:
         project-stack: ${{ inputs.project-stack }}
 
@@ -74,47 +57,21 @@ runs:
       id: bypass-quality-gate
       uses: newlight77/github-actions/.github/actions/sonarcloud-quality-gate-switch@main
       with:
-        sonarcloud-token: ${{ env.SONAR_TOKEN }}
+        sonarcloud-token: ${{ inputs.sonar-token }}
         organization: "newlight77"
-        project-key: "monorepo-github-actions"
-        tmp-gate-id: "91010"
+        project-key: "newlight77_${{ github.event.repository.name }}"
+        tmp-gate-id: "100003"
         pr-head-commit: ${{ github.event.pull_request.head.sha }}
 
-    # - name: run sonarcloud action
-    #   uses: SonarSource/sonarcloud-github-action@v2.0.0
-    #   env:
-    #     SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
-    #   with:
-    #     project-stack: ${{ inputs.project-stack }}
+    - name: run sonarcloud action
+      uses: SonarSource/sonarcloud-github-action@v2.0.0
+      env:
+        SONAR_TOKEN: ${{ inputs.sonar-token }}
 
     - name: slack notification using bypassing if bypass-quality-gate
-      if: contains(env.HEAD_COMMIT_MESSAGE, 'bypass-quality-gate')
-      uses: slackapi/slack-github-action@v1.22.0
-      env:
-        SLACK_BOT_TOKEN: ${{ inputs.SLACK_BOT_TOKEN }}
+      if: ${{ steps.bypass-quality-gate.outputs.bypassed == 'true' }}
+      uses: newlight77/github-actions/.github/actions/slack-notifier@main
       with:
+        slack-bot-token: ${{ inputs.slack-bot-token }}
         channel-id: "C05UA1LUW1H" #ci
-        payload: |
-          {
-            "text": "github workflow",
-            "attachments": [
-              {
-                "color": "warning",
-                "pretext": "Quality Gate bypassed",
-                "fields": [
-                  {
-                    "title": "Pull Request",
-                    "short": true,
-                    "value": "<https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}>"
-                  },
-                  {
-                    "title": "Branch",
-                    "value": "${{ github.head_ref || github.ref_name }}",
-                    "short": true
-                  }
-                ],
-                "footer_icon": "https://github.githubassets.com/favicon.ico",
-                "footer": "<https://github.com/${{ github.repository }} | ${{ github.repository }}/pull/${{ github.event.pull_request.number }}>"
-              }
-            ]
-          }
+        pretext: "Quality Gate bypassed"

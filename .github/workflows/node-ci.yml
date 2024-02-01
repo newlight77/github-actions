@@ -2,224 +2,144 @@ name: Default Node CI Workflow
 
 on:
   workflow_call:
+    secrets:
+      slack-bot-token:
+        description: slack bot token
+        required: true
+      sonar-token:
+        description: sonar token
+        required: false
+      codecov-token:
+        description: codecov token
+        required: false
     inputs:
+      with-unit-test:
+        type: boolean
+        description: 'with unit-test'
+        required: false
+        default: true
+      with-feature-test:
+        type: boolean
+        description: 'with feature-test'
+        required: false
+        default: true
+      with-lint:
+        type: boolean
+        required: false
+        default: true
+      coverage-tool:
+        description: coverage tool ('', sonar | codecov)
+        type: string
+        required: false
       slack-room-id:
-        description: the project stack (node | next | react | java | android | ios)
         type: string
         required: false
-        default: |
-          C05UA1LUW1H
-      project-stack:
-        description: the project stack (node | next | react | java | android | ios)
-        type: string
-        required: false
-        default: |
-          default
-
+        default: C05UA1LUW1H
 
 jobs:
-  # display-variables:
-  #   name: display ci variables
-  #   runs-on: ubuntu-latest
-  #   environment: CI
-  #   steps:
-  #   - name: Use variables
-  #     run: |
-  #       echo "SECRET_TOKEN : $SECRET_TOKEN"
-  #       echo "VAR_TOKEN : $VARS_TOKEN"
-  #       echo "PR_HEAD : $PR_HEAD"
-  #       echo "PR_HEAD_SHA : $PR_HEAD_SHA"
-  #       # echo "PR_HEAD_MESSAGE : $PR_HEAD_MESSAGE"
-  #       # echo "PR_HEAD_COMMIT_MESSAGE : $PR_HEAD_COMMIT_MESSAGE"
-  #       # echo "WK_HEAD_COMMIT_MESSAGE : $WK_HEAD_COMMIT_MESSAGE"
-  #       # echo "GITHUB_CONTEXT : $GITHUB_CONTEXT"
-  #     env:
-  #       SECRET_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-  #       VARS_TOKEN: ${{ vars.SLACK_BOT_TOKEN }}
-  #       PR_HEAD: ${{ toJSON(github.event.pull_request.head) }}
-  #       PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-  #       # PR_HEAD_MESSAGE: ${{ github.event.pull_request.head.message }}
-  #       # PR_HEAD_COMMIT_MESSAGE: ${{ github.event.pull_request.head_commit.message }}
-  #       # WK_HEAD_COMMIT_MESSAGE: ${{ github.event.workflow_run.head_commit.message }}
-  #       # GITHUB_CONTEXT: ${{ toJSON(github) }}
-
-  # build:
-  #   runs-on: ubuntu-latest
-  #   needs: display-variables
-  #   steps:
-  #     - name: Checkout 🛎️
-  #       uses: actions/checkout@v3
-  #       with:
-  #         persist-credentials: false
-  #     - name: install pnpm
-  #       uses: pnpm/action-setup@v2
-  #       with:
-  #         version: 8
-  #         run_install: false
-  #     - name: Set up Node.js
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: '16'
-  #         cache: 'pnpm'
-  #     - name : install dependencies
-  #       run: make install
-  #     - name : build
-  #       run: make build
-      
-  test-unit:
+  display-variables:
+    name: display ci variables
     runs-on: ubuntu-latest
-    # needs: build
-    steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v3
-        with:
-          persist-credentials: false
-      - name: install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-          run_install: false
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-          cache: 'pnpm'
-      - name : install dependencies
-        run: make install
-      - name : build
-        run: make build
-      - name : test
-        run: make test-unit
-      - name: cleanup
-        run: sudo chown -R $(whoami):$(id -ng) .
-      - name: upload coverage from unit tests
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage-from-unit-tests
-          path: |
-            **/coverage/lcov.info
-            **/coverage/coverage-final.json
-          retention-days: 1
-  
-  # lint:
-  #   runs-on: ubuntu-latest
-  #   needs:
-  #     - test-unit
-  #   steps:
-  #     - name: Checkout 🛎️
-  #       uses: actions/checkout@v3
-  #       with:
-  #         persist-credentials: false
-  #     - name: install pnpm
-  #       uses: pnpm/action-setup@v2
-  #       with:
-  #         version: 8
-  #         run_install: false
-  #     - name: Set up Node.js
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: '16'
-  #         cache: 'pnpm'
-  #     - name : install dependencies
-  #       run: make install-offline
-  #     - name : build
-  #       run: make build
-  #     - name : lint
-  #       run: make lint
-
-  # codecov:
-  #   runs-on: ubuntu-latest
-  #   needs:
-  #     - test-unit
-  #   environment: CI
-  #   steps:
-  #     - name: Checkout 🛎️
-  #       uses: actions/checkout@v3
-  #       with:
-  #         persist-credentials: false
-  #     - name: download coverage from unit tests
-  #       uses: actions/download-artifact@v3
-  #       id: download-coverage-from-unit-tests
-  #       with:
-  #         name: coverage-from-unit-tests
-  #       continue-on-error: true
-  #     - name: install pnpm
-  #       uses: pnpm/action-setup@v2
-  #       with:
-  #         version: 8
-  #         run_install: false
-  #     - name: Set up Node.js
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: '16'
-  #         cache: 'pnpm'
-  #     - name : install dependencies
-  #       run: make install-offline
-  #     - name : prepare and merge coverage files
-  #       run: make merge-coverage
-  #     - name: codecov
-  #       uses: codecov/codecov-action@v3
-  #       with:
-  #         token: ${{ secrets.CODECOV_TOKEN }}
-  #         files: ./coverage/lcov.info # optional
-  #         flags: unittests # optional
-  #         name: codecov-umbrella # optional
-  #         fail_ci_if_error: true # optional (default = false)
-  #         verbose: false # optional (default = false)
-
-  sonarcloud:
-    runs-on: ubuntu-latest
-    needs: test-unit
     environment: CI
     steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v3
+    - name: Use variables
+      run: |
+        echo "SLACK_BOT_TOKEN : $SLACK_BOT_TOKEN"
+        echo "SONAR_TOKEN : $SONAR_TOKEN"
+        echo "CODECOV_TOKEN : $CODECOV_TOKEN"
+        echo "LINT : $CODECOV_TLINTOKEN"
+        echo "COVERAGE_TOOL : $COVERAGE_TOOL"
+        echo "SLACK_ROOM_ID : $SLACK_ROOM_ID"
+        # echo "PR_HEAD_SHA : $PR_HEAD_SHA"
+        # echo "PR_HEAD_MESSAGE : $PR_HEAD_MESSAGE"
+        # echo "PR_HEAD_COMMIT_MESSAGE : $PR_HEAD_COMMIT_MESSAGE"
+        # echo "WK_HEAD_COMMIT_MESSAGE : $WK_HEAD_COMMIT_MESSAGE"
+        # echo "GITHUB_CONTEXT : $GITHUB_CONTEXT"
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.slack-bot-token }}
+        SONAR_TOKEN: ${{ secrets.sonar-token }}
+        CODECOV_TOKEN: ${{ secrets.codecov-token }}
+        LINT: ${{ inputs.with-lint }}
+        COVERAGE_TOOL: ${{ inputs.coverage-tool }}
+        SLACK_ROOM_ID: ${{ inputs.slack-room-id }}
+        # PR_HEAD: ${{ toJSON(github.event.pull_request.head) }}
+        # PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        # PR_HEAD_MESSAGE: ${{ github.event.pull_request.head.message }}
+        # PR_HEAD_COMMIT_MESSAGE: ${{ github.event.pull_request.head_commit.message }}
+        # WK_HEAD_COMMIT_MESSAGE: ${{ github.event.workflow_run.head_commit.message }}
+        # GITHUB_CONTEXT: ${{ toJSON(github) }}
+
+
+  test-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: test-uni
+        uses: newlight77/github-actions/.github/actions/test-unit@main
+
+
+  test-feature:
+    runs-on: ubuntu-latest
+    steps:
+      - name: test-feature
+        uses: newlight77/github-actions/.github/actions/test-feature@main
+
+
+  lint:
+    if: inputs.lint == true
+    runs-on: ubuntu-latest
+    needs:
+      - test-unit
+      - test-feature
+    steps:
+      - name: Lint
+        uses: newlight77/github-actions/.github/actions/lint@main
+
+
+  codecov:
+    if: contains(inputs.coverage-tool, 'codecov')
+    runs-on: ubuntu-latest
+    needs:
+      - test-unit
+      - test-feature
+    environment: CI
+    steps:
+      - name: Run codecov
+        uses: newlight77/github-actions/.github/actions/codecov@main
         with:
-          persist-credentials: false
+          codecov-token: ${{ secrets.codecov-token }}
+          with-unit-test: ${{ inputs.with-unit-test }}
+          with-feature-test: ${{ inputs.with-feature-test }}
+  
+
+  sonarcloud:
+    if: contains(inputs.coverage-tool, 'sonar')
+    runs-on: ubuntu-latest
+    needs:
+      - test-unit
+      - test-feature
+    environment: CI
+    steps:
       - name: run sonarcloud scanner
         uses: newlight77/github-actions/.github/actions/sonarcloud-scanner@main
         with:
-          SONARCLOUD_ADMIN_TOKEN: ${{ secrets.SONARCLOUD_ADMIN_TOKEN }}
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          slack-bot-token: ${{ secrets.slack-bot-token }}
+          sonar-token: ${{ secrets.sonar-token }}
           project-stack: "node"
-      
-  # notify-slack:
-  #   needs:
-  #     - codecov
-  #     - sonarcloud
-  #     - lint
-  #   runs-on: ubuntu-latest
-  #   environment: CI
-  #   steps:
-  #     - name: slack notificaiton
-  #       uses: slackapi/slack-github-action@v1.22.0
-  #       env:
-  #         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-  #       with:
-  #         channel-id: "C05UA1LUW1H" #ci
-  #         payload: |
-  #           {
-  #             "text": "github CI passed",
-  #             "attachments": [
-  #               {
-  #                 "color": "warning",
-  #                 "pretext": "Quality Gate bypassed with no-coverage",
-  #                 "fields": [
-  #                   {
-  #                     "title": "Pull Request",
-  #                     "short": true,
-  #                     "value": "<https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}>"
-  #                   },
-  #                   {
-  #                     "title": "Branch",
-  #                     "value": "${{ github.head_ref || github.ref_name }}",
-  #                     "short": true
-  #                   }
-  #                 ],
-  #                 "footer_icon": "https://github.githubassets.com/favicon.ico",
-  #                 "footer": "<https://github.com/${{ github.repository }} | ${{ github.repository }}/pull/${{ github.event.pull_request.number }}>"
-  #               }
-  #             ]
-  #           }
+          with-unit-test: ${{ inputs.with-unit-test }}
+          with-feature-test: ${{ inputs.with-feature-test }}
+  
+
+  notify-slack:
+    if: ${{inputs.slack-room-id != ''}}
+    needs:
+      # - codecov
+      - sonarcloud
+    runs-on: ubuntu-latest
+    steps:
+      - name: slack notification when CI passed
+        uses: newlight77/github-actions/.github/actions/slack-notifier@main
+        with:
+          slack-bot-token: ${{ secrets.slack-bot-token }}
+          channel-id: ${{inputs.slack-room-id}} #ci
+          pretext: "CI passed"
 

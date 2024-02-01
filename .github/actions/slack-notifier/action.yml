@@ -1,0 +1,45 @@
+name: 'Send a notification on slack'
+description: "An action to send a notification on slack"
+
+inputs:
+  slack-bot-token:
+    description: a token to publish metrics
+    required: true
+  channel-id:
+    description: slack channel id
+    default: "C05UA1LUW1H" #ci
+  pretext:
+    description: pretext
+    default: "CI"
+    
+
+
+runs:
+  using: "composite"
+  steps:
+    - name: slack notification
+      if: contains(env.HEAD_COMMIT_MESSAGE, 'bypass-quality-gate')
+      uses: slackapi/slack-github-action@v1.22.0
+      env:
+        SLACK_BOT_TOKEN: ${{ inputs.slack-bot-token }}
+      with:
+        channel-id: ${{inputs.channel-id}}
+        payload: |
+          {
+            "text": "github workflow",
+            "attachments": [
+              {
+                "color": "warning",
+                "pretext": ${{inputs.pretext}},
+                "fields": [
+                  {
+                    "title": "Branch",
+                    "value": "${{ github.head_ref || github.ref_name }}",
+                    "short": true
+                  }
+                ],
+                "footer_icon": "https://github.githubassets.com/favicon.ico",
+                "footer": "<https://github.com/${{ github.repository }} | ${{ github.repository }}/pull/${{ github.event.pull_request.number }}>"
+              }
+            ]
+          }

@@ -1,0 +1,24 @@
+name: 'Run code linting'
+description: "An action to run the code linting"
+
+
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout 🛎️
+      uses: actions/checkout@v3
+      with:
+        persist-credentials: false
+
+    - name: 'install node, pnpm and dependencies'
+      id: install-pnpm-dependencies
+      uses: newlight77/github-actions/.github/actions/install-pnpm-dependencies@main
+
+    - name : build
+      run: make build
+      shell: bash
+
+    - name : lint
+      run: make lint
+      shell: bash

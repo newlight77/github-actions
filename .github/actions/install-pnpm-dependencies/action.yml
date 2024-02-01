@@ -1,0 +1,23 @@
+name: 'Install node and pnpm and dependencies'
+description: "An action to install node and pnpm and dependencies"
+
+
+runs:
+  using: "composite"
+  steps:
+    - name: install pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8
+        run_install: false
+
+    - name: set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+        cache: 'pnpm'
+
+    - name : install dependencies
+      run: make install
+      shell: bash
+

@@ -5,8 +5,8 @@ describe("select quality gate", () => {
   it.skip("integration test : select a gate", () => {
     const sonarToken = '';
     const organization = 'newlight77';
-    const projectKey = 'newlight77_kata-monorepo-github-actions';
-    const gateId = '10003';
+    const projectKey = 'monorepo-github-actions';
+    const gateId = '91710';
 
     selectGate(sonarToken, organization, projectKey, gateId);
   });
@@ -14,11 +14,11 @@ describe("select quality gate", () => {
   it.skip("integration test : get gate by project", async () => {
     const sonarToken = '';
     const organization = 'newlight77';
-    const projectKey = 'newlight77_kata-monorepo-github-actions';
+    const projectKey = 'monorepo-github-actions';
 
     const { name } = await getGateByProject(sonarToken, organization, projectKey);
     console.log(name);
 
-    expect(name).to.eql('Sonar way');
+    expect(name).to.eql('newlight77 Way (Terraform) - exclusion');
   });
 });

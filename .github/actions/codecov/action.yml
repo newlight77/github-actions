@@ -1,0 +1,45 @@
+name: 'Run code coverage analysis with codecov'
+description: "An action to run the code code coverage analysis with codecov"
+
+inputs:
+  codecov-token:
+    description: a token to publish metrics
+    required: true
+  with-unit-test:
+    description: 'with unit-test'
+    required: false
+  with-feature-test:
+    description: 'with feature-test'
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: checkout 🛎️
+      uses: actions/checkout@v3
+      with:
+        persist-credentials: false
+        fetch-depth: 0
+
+    - name: 'Download coverage from multiple test suites'
+      id: download-all-coverage
+      uses: newlight77/github-actions/.github/actions/download-all-coverage@main
+      with:
+        with-unit-test: ${{ inputs.with-unit-test }}
+        with-feature-test: ${{ inputs.with-feature-test }}
+
+    - name: 'Merge coverage from multiple test suites'
+      id: merge-coverage
+      uses: newlight77/github-actions/.github/actions/merge-coverage@main
+      with:
+        with-unit-test: ${{ inputs.with-unit-test }}
+        with-feature-test: ${{ inputs.with-feature-test }}
+
+    - name: codecov
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: ./coverage/lcov.info # optional
+        name: codecov-umbrella # optional
+        fail_ci_if_error: true # optional (default = false)
+        verbose: false # optional (default = false)
