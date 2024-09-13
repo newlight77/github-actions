@@ -14,10 +14,9 @@ runs:
     - name: set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '16'
+        node-version: '20'
         cache: 'pnpm'
 
     - name : install dependencies
       run: make install
       shell: bash
-
