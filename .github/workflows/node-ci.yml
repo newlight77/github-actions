@@ -23,6 +23,11 @@ on:
         description: 'with feature-test'
         required: false
         default: true
+      with-smoke-test:
+        type: boolean
+        description: 'with smoke-test'
+        required: false
+        default: true
       with-lint:
         type: boolean
         required: false
@@ -84,12 +89,20 @@ jobs:
         uses: newlight77/github-actions/.github/actions/test-feature@main
 
 
+  test-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: test-smoke
+        uses: newlight77/github-actions/.github/actions/test-feature@main
+
+
   lint:
     if: inputs.lint == true
     runs-on: ubuntu-latest
     needs:
       - test-unit
       - test-feature
+      - test-smoke
     steps:
       - name: Lint
         uses: newlight77/github-actions/.github/actions/lint@main
@@ -101,6 +114,7 @@ jobs:
     needs:
       - test-unit
       - test-feature
+      - test-smoke
     environment: CI
     steps:
       - name: Run codecov
@@ -109,7 +123,8 @@ jobs:
           codecov-token: ${{ secrets.codecov-token }}
           with-unit-test: ${{ inputs.with-unit-test }}
           with-feature-test: ${{ inputs.with-feature-test }}
-  
+          with-smoke-test: ${{ inputs.with-smoke-test }}
+
 
   sonarcloud:
     if: contains(inputs.coverage-tool, 'sonar')
@@ -117,6 +132,7 @@ jobs:
     needs:
       - test-unit
       - test-feature
+      - test-smoke
     environment: CI
     steps:
       - name: run sonarcloud scanner
@@ -127,7 +143,8 @@ jobs:
           project-stack: "node"
           with-unit-test: ${{ inputs.with-unit-test }}
           with-feature-test: ${{ inputs.with-feature-test }}
-  
+          with-smoke-test: ${{ inputs.with-smoke-test }}
+
 
   notify-slack:
     if: ${{inputs.slack-room-id != ''}}
@@ -142,4 +159,3 @@ jobs:
           slack-bot-token: ${{ secrets.slack-bot-token }}
           channel-id: ${{inputs.slack-room-id}} #ci
           pretext: "CI passed"
-
