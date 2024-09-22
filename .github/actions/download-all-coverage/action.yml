@@ -8,6 +8,9 @@ inputs:
   with-feature-test:
     description: 'with feature-test'
     required: false
+  with-smoke-test:
+    description: 'with smoke-test'
+    required: false
 
 
 runs:
@@ -17,9 +20,9 @@ runs:
     - name: download coverage from unit tests
       if: inputs.with-unit-test == 'true'
       uses: actions/download-artifact@v3
-      id: download-coverage-from-unit-tests
+      id: download-coverage-from-unit-test
       with:
-        name: coverage-from-unit-tests
+        name: coverage-from-unit-test
       continue-on-error: true
 
     - name : list all unit-test coverage files
@@ -52,6 +55,8 @@ runs:
         done
       shell: bash
 
+
+
     - name: download coverage from feature tests
       if: inputs.with-feature-test == 'true'
       uses: actions/download-artifact@v3
@@ -75,7 +80,7 @@ runs:
       shell: bash
       continue-on-error: true
 
-    - name: Move feature-test reports under ./coverage/feature
+    - name: Move feature-test reports under ./coverage/feature-*
       if: inputs.with-feature-test == 'true'
       run: |
         i=0;
@@ -87,8 +92,50 @@ runs:
           dirname=$(basename $(dirname $(dirname $file)))
           mkdir -p ./coverage/feature ;
           mv $file ./coverage/feature/coverage-feature-$i-$dirname-$filename;
+          echo mv $file ./coverage/feature/coverage-feature-$i-$dirname-$filename;
         done
       shell: bash
+
+
+    - name: download coverage from smoke tests
+      if: inputs.with-smoke-test == 'true'
+      uses: actions/download-artifact@v3
+      id: download-coverage-from-smoke-tests
+      with:
+        name: coverage-from-smoke-tests
+      continue-on-error: true
+
+    - name : list all smoke-test coverage files
+      if: inputs.with-smoke-test == 'true'
+      run: |
+        echo "::group::smoke-test coverage files"
+        export LC_ALL=C
+
+        # find ./ -regextype posix-extended -regex "/(.*\/)?coverage\/(.*)?(lcov.*.info|coverage.*.json|report.*.xml)/gm"
+        find ./ -type d -name node_modules -prune \
+          -o -regextype posix-extended -regex "(.*/)?coverage/smoke*/(lcov.*.info|coverage.*.json|report.*.xml)" \
+          -print
+
+        echo "::endgroup::"
+      shell: bash
+      continue-on-error: true
+
+    - name: Move smoke-test reports under ./coverage/smoke
+      if: inputs.with-smoke-test == 'true'
+      run: |
+        i=0;
+        for file in $(find ./ -type d -name node_modules -prune \
+          -o -regextype posix-extended -regex "(.*/)?coverage/smoke*/(lcov.*.info|coverage.*.json|report.*.xml)" \
+          -print);
+        do i=$(( i + 1 ));
+          filename=$(basename $file);
+          dirname=$(basename $(dirname $(dirname $file)))
+          mkdir -p ./coverage/smoke ;
+          mv $file ./coverage/smoke/coverage-smoke-$i-$dirname-$filename;
+        done
+      shell: bash
+
+
 
     - if: steps.download-coverage.outputs.download-path != ''
       run: |

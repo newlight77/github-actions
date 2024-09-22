@@ -11,6 +11,9 @@ inputs:
   with-feature-test:
     description: 'with feature-test'
     required: false
+  with-smoke-test:
+    description: 'with smoke-test'
+    required: false
 
 runs:
   using: "composite"
@@ -27,6 +30,7 @@ runs:
       with:
         with-unit-test: ${{ inputs.with-unit-test }}
         with-feature-test: ${{ inputs.with-feature-test }}
+        with-smoke-test: ${{ inputs.with-smoke-test }}
 
     - name: 'Merge coverage from multiple test suites'
       id: merge-coverage
@@ -34,6 +38,7 @@ runs:
       with:
         with-unit-test: ${{ inputs.with-unit-test }}
         with-feature-test: ${{ inputs.with-feature-test }}
+        with-smoke-test: ${{ inputs.with-smoke-test }}
 
     - name: codecov
       uses: codecov/codecov-action@v3

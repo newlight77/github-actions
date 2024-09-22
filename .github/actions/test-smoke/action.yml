@@ -33,9 +33,5 @@ runs:
         path: |
           **/coverage/smoke/**/lcov.info
           **/coverage/smoke/**/coverage-final.json
-          **/coverage/smoke/**/lcov.info
-          **/coverage/smoke/**/coverage-final.json
-          **/coverage/smoke/**/lcov.info
-          **/coverage/smoke/**/coverage-final.json
           foobar # hack to force coverage folder to be in artifact
         retention-days: 1

@@ -29,9 +29,9 @@ runs:
     - name: upload coverage from unit tests
       uses: actions/upload-artifact@v3
       with:
-        name: coverage-from-unit-tests
+        name: coverage-from-unit-test
         path: |
           **/coverage/lcov.info
           **/coverage/coverage-final.json
-          foobar # hack to force coverage folder to be in artifact 
+          foobar # hack to force coverage folder to be in artifact
         retention-days: 1

@@ -19,23 +19,19 @@ runs:
       shell: bash
 
     - name : test
-      run: make test-features
+      run: make test-feature
       shell: bash
 
     - name: cleanup
       run: sudo chown -R $(whoami):$(id -ng) .
       shell: bash
 
-    - name: upload coverage from features tests
+    - name: upload coverage from feature tests
       uses: actions/upload-artifact@v3
       with:
         name: coverage-from-feature-tests
         path: |
-          **/coverage/**/lcov.info
-          **/coverage/**/coverage-final.json
-          **/coverage/**/lcov.info
-          **/coverage/**/coverage-final.json
-          **/coverage/**/lcov.info
-          **/coverage/**/coverage-final.json
+          **/coverage/feature*/lcov.info
+          **/coverage/feature*/coverage-final.json
           foobar # hack to force coverage folder to be in artifact
         retention-days: 1

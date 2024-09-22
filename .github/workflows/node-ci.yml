@@ -93,7 +93,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: test-smoke
-        uses: newlight77/github-actions/.github/actions/test-feature@main
+        uses: newlight77/github-actions/.github/actions/test-smoke@main
 
 
   lint:

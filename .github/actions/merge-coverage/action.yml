@@ -10,6 +10,10 @@ inputs:
     description: 'with feature-test'
     required: false
     default: 'true'
+  with-smoke-test:
+    description: 'with smoke-test'
+    required: false
+    default: 'true'
 
 
 runs:
@@ -25,7 +29,7 @@ runs:
       shell: bash
 
     - name : list all coverage files before merge
-      if: inputs.with-unit-test == 'true'
+      # if: inputs.with-unit-test == 'true'
       run: |
         echo "::group::coverage files before merge"
         export LC_ALL=C
@@ -44,10 +48,16 @@ runs:
         nyc merge coverage/unit coverage/merged/coverage-unit-merged.json
       shell: bash
 
-    - name: merge feature-test coverage into coverage/merged/coverage-features-merged.json 
+    - name: merge feature-test coverage into coverage/merged/coverage-feature-merged.json
       if: inputs.with-feature-test == 'true'
       run: |
-        nyc merge coverage/feature coverage/merged/coverage-features-merged.json 
+        nyc merge coverage/feature coverage/merged/coverage-feature-merged.json
+      shell: bash
+
+    - name: merge smoke-test coverage into coverage/merged/coverage-smoke-merged.json
+      if: inputs.with-smoke-test == 'true'
+      run: |
+        nyc merge coverage/smoke coverage/merged/coverage-smoke-merged.json
       shell: bash
 
     - name: convert merged coverage into coverage/lcov.info
