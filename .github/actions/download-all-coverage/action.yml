@@ -43,6 +43,7 @@ runs:
     - name: Move unit-test reports under ./coverage/unit
       if: inputs.with-unit-test == 'true'
       run: |
+        echo "::group::unit-test move coverage files ./coverage/unit"
         i=0;
         for file in $(find ./ -type d -name node_modules -prune \
           -o -regextype posix-extended -regex "(.*/)?coverage/(.*)?(lcov.*.info|coverage.*.json|report.*.xml)" \
@@ -52,7 +53,9 @@ runs:
           dirname=$(basename $(dirname $(dirname $file)))
           mkdir -p ./coverage/unit ;
           mv $file ./coverage/unit/coverage-unit-$i-$dirname-$filename;
+          echo $file ./coverage/unit/coverage-unit-$i-$dirname-$filename;
         done
+        echo "::endgroup::"
       shell: bash
 
 
@@ -83,6 +86,7 @@ runs:
     - name: Move feature-test reports under ./coverage/feature-*
       if: inputs.with-feature-test == 'true'
       run: |
+        echo "::group::feature-test move coverage files ./coverage/feature-*"
         i=0;
         for file in $(find ./ -type d -name node_modules -prune \
           -o -regextype posix-extended -regex "(.*/)?coverage/feature.*/(lcov.*.info|coverage.*.json|report.*.xml)" \
@@ -94,6 +98,7 @@ runs:
           mv $file ./coverage/feature/coverage-feature-$i-$dirname-$filename;
           echo mv $file ./coverage/feature/coverage-feature-$i-$dirname-$filename;
         done
+        echo "::endgroup::"
       shell: bash
 
 
@@ -123,6 +128,7 @@ runs:
     - name: Move smoke-test reports under ./coverage/smoke
       if: inputs.with-smoke-test == 'true'
       run: |
+        echo "::group::smoke-test move coverage files ./coverage/smoke"
         i=0;
         for file in $(find ./ -type d -name node_modules -prune \
           -o -regextype posix-extended -regex "(.*/)?coverage/smoke*/(lcov.*.info|coverage.*.json|report.*.xml)" \
@@ -132,7 +138,9 @@ runs:
           dirname=$(basename $(dirname $(dirname $file)))
           mkdir -p ./coverage/smoke ;
           mv $file ./coverage/smoke/coverage-smoke-$i-$dirname-$filename;
+          echo mv $file ./coverage/smoke/coverage-smoke-$i-$dirname-$filename;
         done
+        echo "::endgroup::"
       shell: bash
 
 
