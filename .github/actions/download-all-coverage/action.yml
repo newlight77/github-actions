@@ -192,6 +192,49 @@ runs:
 
 
 
+    - name: download coverage from regression tests
+      if: inputs.with-regression-test == 'true'
+      uses: actions/download-artifact@v3
+      id: download-coverage-from-regression-tests
+      with:
+        name: coverage-from-regression-tests
+      continue-on-error: true
+
+    - name : list all regression-test coverage files
+      if: inputs.with-regression-test == 'true'
+      run: |
+        echo "::group::regression-test coverage files"
+        export LC_ALL=C
+
+        # find ./ -regextype posix-extended -regex "/(.*\/)?coverage/regression.*\/(.*)?(lcov.*.info|coverage.*.json|report.*.xml)/gm"
+        find ./ -type d -name node_modules -prune \
+          -o -regextype posix-extended -regex "(.*/)?coverage/regression.*/(lcov.*.info|coverage.*.json|report.*.xml)" \
+          -print
+
+        echo "::endgroup::"
+      shell: bash
+      continue-on-error: true
+
+    - name: Move regression-test reports under ./coverage/regression
+      if: inputs.with-regression-test == 'true'
+      run: |
+        echo "::group::regression-test move coverage files ./coverage/regression"
+        i=0;
+        for file in $(find ./ -type d -name node_modules -prune \
+          -o -regextype posix-extended -regex "(.*/)?coverage/regression.*/(lcov.*.info|coverage.*.json|report.*.xml)" \
+          -print);
+        do i=$(( i + 1 ));
+          filename=$(basename $file);
+          dirname=$(basename $(dirname $(dirname $file)))
+          mkdir -p ./coverage/regression ;
+          mv $file ./coverage/regression/coverage-regression-$i-$dirname-$filename;
+          echo mv $file ./coverage/regression/coverage-regression-$i-$dirname-$filename;
+        done
+        echo "::endgroup::"
+      shell: bash
+
+
+
     - if: steps.download-coverage.outputs.download-path != ''
       run: |
         for file in $(find ./coverage -name '*lcov*.info' -o -name 'coverage*.json' -o -name 'report*.xml');

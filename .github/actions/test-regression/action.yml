@@ -1,0 +1,37 @@
+name: 'Run regression tests'
+description: "An action to run regression tests"
+
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout 🛎️
+      uses: actions/checkout@v3
+      with:
+        persist-credentials: false
+
+    - name: 'install node, pnpm and dependencies'
+      id: install-pnpm-dependencies
+      uses: newlight77/github-actions/.github/actions/install-pnpm-dependencies@main
+
+    - name : build
+      run: make build
+      shell: bash
+
+    - name : test
+      run: make test-regression
+      shell: bash
+
+    - name: cleanup
+      run: sudo chown -R $(whoami):$(id -ng) .
+      shell: bash
+
+    - name: upload coverage from regression tests
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-from-regression-tests
+        path: |
+          **/coverage/regression*/lcov.info
+          **/coverage/regression*/coverage-final.json
+          foobar # hack to force coverage folder to be in artifact
+        retention-days: 1

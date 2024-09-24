@@ -18,6 +18,10 @@ inputs:
     description: 'with smoke-test'
     required: false
     default: 'true'
+  with-regression-test:
+    description: 'with regression-test'
+    required: false
+    default: 'true'
 
 
 runs:
@@ -68,6 +72,12 @@ runs:
       if: inputs.with-smoke-test == 'true'
       run: |
         nyc merge coverage/smoke coverage/merged/coverage-smoke-merged.json
+      shell: bash
+
+    - name: merge regression-test coverage into coverage/merged/coverage-regression-merged.json
+      if: inputs.with-regression-test == 'true'
+      run: |
+        nyc merge coverage/regression coverage/merged/coverage-regression-merged.json
       shell: bash
 
     - name: convert merged coverage into coverage/lcov.info

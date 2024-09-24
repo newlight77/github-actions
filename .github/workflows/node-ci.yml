@@ -33,6 +33,11 @@ on:
         description: 'with smoke-test'
         required: false
         default: true
+      with-regression-test:
+        type: boolean
+        description: 'with regression-test'
+        required: false
+        default: true
       with-lint:
         type: boolean
         required: false
@@ -108,6 +113,13 @@ jobs:
         uses: newlight77/github-actions/.github/actions/test-smoke@main
 
 
+  test-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - name: test-regression
+        uses: newlight77/github-actions/.github/actions/test-regression@main
+
+
   lint:
     if: inputs.lint == true
     runs-on: ubuntu-latest
@@ -116,6 +128,7 @@ jobs:
       - test-feature
       - test-sanity
       - test-smoke
+      - test-regression
     steps:
       - name: Lint
         uses: newlight77/github-actions/.github/actions/lint@main
@@ -129,6 +142,7 @@ jobs:
       - test-feature
       - test-sanity
       - test-smoke
+      - test-regression
     environment: CI
     steps:
       - name: Run codecov
@@ -139,6 +153,7 @@ jobs:
           with-feature-test: ${{ inputs.with-feature-test }}
           with-smoke-test: ${{ inputs.with-smoke-test }}
           with-sanity-test: ${{ inputs.with-sanity-test }}
+          with-regression-test: ${{ inputs.with-regression-test }}
 
 
   sonarcloud:
@@ -149,6 +164,7 @@ jobs:
       - test-feature
       - test-sanity
       - test-smoke
+      - test-regression
     environment: CI
     steps:
       - name: run sonarcloud scanner
@@ -161,6 +177,7 @@ jobs:
           with-feature-test: ${{ inputs.with-feature-test }}
           with-smoke-test: ${{ inputs.with-smoke-test }}
           with-sanity-test: ${{ inputs.with-sanity-test }}
+          with-regression-test: ${{ inputs.with-regression-test }}
 
 
   notify-slack:

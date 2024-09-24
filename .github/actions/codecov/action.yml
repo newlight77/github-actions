@@ -17,6 +17,10 @@ inputs:
   with-smoke-test:
     description: 'with smoke-test'
     required: false
+  with-regression-test:
+    description: 'with regression-test'
+    required: false
+
 
 runs:
   using: "composite"
@@ -35,6 +39,7 @@ runs:
         with-feature-test: ${{ inputs.with-feature-test }}
         with-sanity-test: ${{ inputs.with-sanity-test }}
         with-smoke-test: ${{ inputs.with-smoke-test }}
+        with-regression-test: ${{ inputs.with-regression-test }}
 
     - name: 'Merge coverage from multiple test suites'
       id: merge-coverage
@@ -44,6 +49,7 @@ runs:
         with-feature-test: ${{ inputs.with-feature-test }}
         with-sanity-test: ${{ inputs.with-sanity-test }}
         with-smoke-test: ${{ inputs.with-smoke-test }}
+        with-regression-test: ${{ inputs.with-regression-test }}
 
     - name: codecov
       uses: codecov/codecov-action@v3
