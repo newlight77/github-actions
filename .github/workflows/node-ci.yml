@@ -23,6 +23,11 @@ on:
         description: 'with feature-test'
         required: false
         default: true
+      with-sanity-test:
+        type: boolean
+        description: 'with sanity-test'
+        required: false
+        default: true
       with-smoke-test:
         type: boolean
         description: 'with smoke-test'
@@ -89,6 +94,13 @@ jobs:
         uses: newlight77/github-actions/.github/actions/test-feature@main
 
 
+  test-sanity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: test-sanity
+        uses: newlight77/github-actions/.github/actions/test-sanity@main
+
+
   test-smoke:
     runs-on: ubuntu-latest
     steps:
@@ -102,6 +114,7 @@ jobs:
     needs:
       - test-unit
       - test-feature
+      - test-sanity
       - test-smoke
     steps:
       - name: Lint
@@ -114,6 +127,7 @@ jobs:
     needs:
       - test-unit
       - test-feature
+      - test-sanity
       - test-smoke
     environment: CI
     steps:
@@ -124,6 +138,7 @@ jobs:
           with-unit-test: ${{ inputs.with-unit-test }}
           with-feature-test: ${{ inputs.with-feature-test }}
           with-smoke-test: ${{ inputs.with-smoke-test }}
+          with-sanity-test: ${{ inputs.with-sanity-test }}
 
 
   sonarcloud:
@@ -132,6 +147,7 @@ jobs:
     needs:
       - test-unit
       - test-feature
+      - test-sanity
       - test-smoke
     environment: CI
     steps:
@@ -144,6 +160,7 @@ jobs:
           with-unit-test: ${{ inputs.with-unit-test }}
           with-feature-test: ${{ inputs.with-feature-test }}
           with-smoke-test: ${{ inputs.with-smoke-test }}
+          with-sanity-test: ${{ inputs.with-sanity-test }}
 
 
   notify-slack:

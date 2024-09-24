@@ -8,6 +8,9 @@ inputs:
   with-feature-test:
     description: 'with feature-test'
     required: false
+  with-sanity-test:
+    description: 'with sanity-test'
+    required: false
   with-smoke-test:
     description: 'with smoke-test'
     required: false
@@ -100,6 +103,50 @@ runs:
         done
         echo "::endgroup::"
       shell: bash
+
+
+
+    - name: download coverage from sanity tests
+      if: inputs.with-sanity-test == 'true'
+      uses: actions/download-artifact@v3
+      id: download-coverage-from-sanity-tests
+      with:
+        name: coverage-from-sanity-tests
+      continue-on-error: true
+
+    - name : list all sanity-test coverage files
+      if: inputs.with-sanity-test == 'true'
+      run: |
+        echo "::group::sanity-test coverage files"
+        export LC_ALL=C
+
+        # find ./ -regextype posix-extended -regex "/(.*\/)?coverage\/(.*)?(lcov.*.info|coverage.*.json|report.*.xml)/gm"
+        find ./ -type d -name node_modules -prune \
+          -o -regextype posix-extended -regex "(.*/)?coverage/sanity*/(lcov.*.info|coverage.*.json|report.*.xml)" \
+          -print
+
+        echo "::endgroup::"
+      shell: bash
+      continue-on-error: true
+
+    - name: Move sanity-test reports under ./coverage/sanity
+      if: inputs.with-sanity-test == 'true'
+      run: |
+        echo "::group::sanity-test move coverage files ./coverage/sanity"
+        i=0;
+        for file in $(find ./ -type d -name node_modules -prune \
+          -o -regextype posix-extended -regex "(.*/)?coverage/sanity*/(lcov.*.info|coverage.*.json|report.*.xml)" \
+          -print);
+        do i=$(( i + 1 ));
+          filename=$(basename $file);
+          dirname=$(basename $(dirname $(dirname $file)))
+          mkdir -p ./coverage/sanity ;
+          mv $file ./coverage/sanity/coverage-sanity-$i-$dirname-$filename;
+          echo mv $file ./coverage/sanity/coverage-sanity-$i-$dirname-$filename;
+        done
+        echo "::endgroup::"
+      shell: bash
+
 
 
     - name: download coverage from smoke tests

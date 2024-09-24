@@ -1,0 +1,37 @@
+name: 'Run sanity tests'
+description: "An action to run sanity tests"
+
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout 🛎️
+      uses: actions/checkout@v3
+      with:
+        persist-credentials: false
+
+    - name: 'install node, pnpm and dependencies'
+      id: install-pnpm-dependencies
+      uses: newlight77/github-actions/.github/actions/install-pnpm-dependencies@main
+
+    - name : build
+      run: make build
+      shell: bash
+
+    - name : test
+      run: make test-sanity
+      shell: bash
+
+    - name: cleanup
+      run: sudo chown -R $(whoami):$(id -ng) .
+      shell: bash
+
+    - name: upload coverage from sanity tests
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-from-sanity-tests
+        path: |
+          **/coverage/sanity/**/lcov.info
+          **/coverage/sanity/**/coverage-final.json
+          foobar # hack to force coverage folder to be in artifact
+        retention-days: 1

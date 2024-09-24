@@ -11,6 +11,9 @@ inputs:
   with-feature-test:
     description: 'with feature-test'
     required: false
+  with-sanity-test:
+    description: 'with sanity-test'
+    required: false
   with-smoke-test:
     description: 'with smoke-test'
     required: false
@@ -30,6 +33,7 @@ runs:
       with:
         with-unit-test: ${{ inputs.with-unit-test }}
         with-feature-test: ${{ inputs.with-feature-test }}
+        with-sanity-test: ${{ inputs.with-sanity-test }}
         with-smoke-test: ${{ inputs.with-smoke-test }}
 
     - name: 'Merge coverage from multiple test suites'
@@ -38,6 +42,7 @@ runs:
       with:
         with-unit-test: ${{ inputs.with-unit-test }}
         with-feature-test: ${{ inputs.with-feature-test }}
+        with-sanity-test: ${{ inputs.with-sanity-test }}
         with-smoke-test: ${{ inputs.with-smoke-test }}
 
     - name: codecov

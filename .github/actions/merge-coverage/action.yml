@@ -10,6 +10,10 @@ inputs:
     description: 'with feature-test'
     required: false
     default: 'true'
+  with-sanity-test:
+    description: 'with sanity-test'
+    required: false
+    default: 'true'
   with-smoke-test:
     description: 'with smoke-test'
     required: false
@@ -52,6 +56,12 @@ runs:
       if: inputs.with-feature-test == 'true'
       run: |
         nyc merge coverage/feature coverage/merged/coverage-feature-merged.json
+      shell: bash
+
+    - name: merge sanity-test coverage into coverage/merged/coverage-sanity-merged.json
+      if: inputs.with-sanity-test == 'true'
+      run: |
+        nyc merge coverage/sanity coverage/merged/coverage-sanity-merged.json
       shell: bash
 
     - name: merge smoke-test coverage into coverage/merged/coverage-smoke-merged.json
