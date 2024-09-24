@@ -86,6 +86,7 @@ jobs:
 
 
   test-unit:
+    if: inputs.with-unit-test == true
     runs-on: ubuntu-latest
     steps:
       - name: test-uni
@@ -93,6 +94,7 @@ jobs:
 
 
   test-feature:
+    if: inputs.with-feature-test == true
     runs-on: ubuntu-latest
     steps:
       - name: test-feature
@@ -100,6 +102,7 @@ jobs:
 
 
   test-sanity:
+    if: inputs.with-sanity-test == true
     runs-on: ubuntu-latest
     steps:
       - name: test-sanity
@@ -107,6 +110,7 @@ jobs:
 
 
   test-smoke:
+    if: inputs.with-smoke-test == true
     runs-on: ubuntu-latest
     steps:
       - name: test-smoke
@@ -114,6 +118,7 @@ jobs:
 
 
   test-regression:
+    if: inputs.with-regression-test == true
     runs-on: ubuntu-latest
     steps:
       - name: test-regression
