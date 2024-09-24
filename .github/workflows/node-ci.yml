@@ -131,9 +131,6 @@ jobs:
     needs:
       - test-unit
       - test-feature
-      - test-sanity
-      - test-smoke
-      - test-regression
     steps:
       - name: Lint
         uses: newlight77/github-actions/.github/actions/lint@main
@@ -145,9 +142,6 @@ jobs:
     needs:
       - test-unit
       - test-feature
-      - test-sanity
-      - test-smoke
-      - test-regression
     environment: CI
     steps:
       - name: Run codecov
@@ -167,9 +161,6 @@ jobs:
     needs:
       - test-unit
       - test-feature
-      - test-sanity
-      - test-smoke
-      - test-regression
     environment: CI
     steps:
       - name: run sonarcloud scanner
