@@ -31,7 +31,7 @@ runs:
       with:
         name: coverage-from-sanity-tests
         path: |
-          **/coverage/sanity/**/lcov.info
-          **/coverage/sanity/**/coverage-final.json
+          **/coverage/sanity*/**/lcov.info
+          **/coverage/sanity*/**/coverage-final.json
           foobar # hack to force coverage folder to be in artifact
         retention-days: 1
