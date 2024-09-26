@@ -89,7 +89,7 @@ jobs:
     if: inputs.with-unit-test == true
     runs-on: ubuntu-latest
     steps:
-      - name: test-uni
+      - name: test-unit
         uses: newlight77/github-actions/.github/actions/test-unit@main
 
 
@@ -126,7 +126,7 @@ jobs:
 
 
   lint:
-    if: inputs.lint == true
+    if: inputs.with-lint == true
     runs-on: ubuntu-latest
     needs:
       - test-unit
@@ -180,7 +180,8 @@ jobs:
     if: ${{inputs.slack-room-id != ''}}
     needs:
       # - codecov
-      - sonarcloud
+      # - sonarcloud
+      - lint
     runs-on: ubuntu-latest
     steps:
       - name: slack notification when CI passed
