@@ -6,7 +6,7 @@ runs:
   using: "composite"
   steps:
     - name: Checkout 🛎️
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         persist-credentials: false
 
@@ -27,7 +27,7 @@ runs:
       shell: bash
 
     - name: upload coverage from smoke tests
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: coverage-from-smoke-tests
         path: |

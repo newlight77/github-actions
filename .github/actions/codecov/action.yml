@@ -26,7 +26,7 @@ runs:
   using: "composite"
   steps:
     - name: checkout 🛎️
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         persist-credentials: false
         fetch-depth: 0
@@ -52,7 +52,7 @@ runs:
         with-regression-test: ${{ inputs.with-regression-test }}
 
     - name: codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         token: ${{ inputs.codecov-token }}
         files: ./coverage/lcov.info # optional

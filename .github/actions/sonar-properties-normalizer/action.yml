@@ -48,14 +48,14 @@ runs:
         echo "<--- beginning --->"
         echo
         cat sonar-project.properties
-        echo 
+        echo
         echo "<--- end --->"
 
         echo "::endgroup::"
       shell: bash
 
     - name: upload merged sonar-project.properties
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: merged-sonar-project.properties
         path: |

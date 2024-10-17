@@ -25,7 +25,7 @@ runs:
 
     - name: download coverage from unit tests
       if: inputs.with-unit-test == 'true'
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       id: download-coverage-from-unit-test
       with:
         name: coverage-from-unit-test
@@ -68,7 +68,7 @@ runs:
 
     - name: download coverage from feature tests
       if: inputs.with-feature-test == 'true'
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       id: download-coverage-from-feature-tests
       with:
         name: coverage-from-feature-tests
@@ -111,7 +111,7 @@ runs:
 
     - name: download coverage from sanity tests
       if: inputs.with-sanity-test == 'true'
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       id: download-coverage-from-sanity-tests
       with:
         name: coverage-from-sanity-tests
@@ -154,7 +154,7 @@ runs:
 
     - name: download coverage from smoke tests
       if: inputs.with-smoke-test == 'true'
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       id: download-coverage-from-smoke-tests
       with:
         name: coverage-from-smoke-tests
@@ -197,7 +197,7 @@ runs:
 
     - name: download coverage from regression tests
       if: inputs.with-regression-test == 'true'
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       id: download-coverage-from-regression-tests
       with:
         name: coverage-from-regression-tests
